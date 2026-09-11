@@ -42,6 +42,11 @@ export function TemplateCard({
       <div className="space-y-0.5 p-3">
         <p className="truncate text-sm font-medium text-[#302C27]">{template.name}</p>
         <p className="text-xs text-[#81786E]">{formatIdr(template.price)}</p>
+        {template.invitations_count !== null && template.invitations_count > 0 ? (
+          <p className="text-[11px] text-[#A8A29A]">
+            {new Intl.NumberFormat("id-ID").format(template.invitations_count)} orang telah pesan
+          </p>
+        ) : null}
       </div>
     </Link>
   );
