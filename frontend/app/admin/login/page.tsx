@@ -34,7 +34,11 @@ function AdminLoginForm() {
       router.push(resolveRedirectTarget(searchParams.get("redirect")));
       router.refresh();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Terjadi kesalahan. Silakan coba lagi.");
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : "Tidak dapat terhubung ke server. Periksa koneksi Anda dan coba lagi.",
+      );
     } finally {
       setLoading(false);
     }
