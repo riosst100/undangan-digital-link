@@ -6,11 +6,11 @@ import { login, logout } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/client";
 
 function resolveRedirectTarget(raw: string | null): string {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/dashboard";
-  return raw.startsWith("/dashboard") ? raw : "/dashboard";
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/admin/dashboard";
+  return raw.startsWith("/admin") ? raw : "/admin/dashboard";
 }
 
-function LoginForm() {
+function AdminLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -25,9 +25,9 @@ function LoginForm() {
     try {
       const user = await login(email, password);
 
-      if (user.role !== "customer") {
+      if (user.role !== "admin") {
         await logout();
-        setError("Akun ini bukan akun customer. Gunakan halaman login admin.");
+        setError("Akun ini bukan akun admin.");
         return;
       }
 
@@ -41,11 +41,9 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-[#FBF7F0] px-6">
+    <div className="flex min-h-dvh items-center justify-center bg-zinc-100 px-6">
       <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4 rounded-2xl bg-white p-8 shadow-sm">
-        <h1 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-[#302C27]">
-          Masuk
-        </h1>
+        <h1 className="text-2xl font-semibold text-zinc-900">Admin Login</h1>
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
         <input
           type="email"
@@ -53,7 +51,7 @@ function LoginForm() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-lg border border-[#E8DCC8] px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
         />
         <input
           type="password"
@@ -61,12 +59,12 @@ function LoginForm() {
           placeholder="Kata sandi"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-lg border border-[#E8DCC8] px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
         />
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-full bg-[#C9A86A] px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+          className="w-full rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
         >
           {loading ? "Memproses..." : "Masuk"}
         </button>
@@ -75,10 +73,10 @@ function LoginForm() {
   );
 }
 
-export default function LoginPage() {
+export default function AdminLoginPage() {
   return (
     <Suspense>
-      <LoginForm />
+      <AdminLoginForm />
     </Suspense>
   );
 }

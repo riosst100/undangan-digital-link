@@ -30,12 +30,26 @@ async function getSessionUser(request: NextRequest): Promise<SessionUser | null>
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const user = await getSessionUser(request);
+
+  // /admin/login is reachable by anyone (it's the admin sign-in page
+  // itself) — everything else under /admin, plus all of /dashboard,
+  // requires a session.
+  if (pathname === "/admin/login") {
+    return NextResponse.next();
+  }
 
   const isAdminRoute = pathname.startsWith("/admin");
   const isDashboardRoute = pathname.startsWith("/dashboard");
 
-  if ((isAdminRoute || isDashboardRoute) && !user) {
+  const user = await getSessionUser(request);
+
+  if (isAdminRoute && !user) {
+    const loginUrl = new URL("/admin/login", request.url);
+    loginUrl.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  if (isDashboardRoute && !user) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
@@ -46,7 +60,7 @@ export async function proxy(request: NextRequest) {
   }
 
   if (isDashboardRoute && user && user.role === "admin") {
-    return NextResponse.redirect(new URL("/admin", request.url));
+    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
   }
 
   return NextResponse.next();
