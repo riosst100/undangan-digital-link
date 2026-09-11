@@ -15,7 +15,7 @@ async function loadCatalog(): Promise<TemplateCatalog | null> {
 
 export default async function Home() {
   const catalog = await loadCatalog();
-  const hasCatalog = catalog && (catalog.newest.length > 0 || catalog.exclusive.length > 0);
+  const hasCatalog = catalog && (catalog.all.length > 0 || catalog.exclusive.length > 0);
 
   return (
     <div className="flex min-h-dvh flex-col bg-[#FBF7F0] text-[#302C27]">
@@ -27,14 +27,13 @@ export default async function Home() {
         {hasCatalog ? (
           <div id="katalog" className="scroll-mt-20 pb-16 pt-4">
             <CatalogSection
-              title="Terbaru"
-              subtitle="Desain terbaru yang baru saja kami tambahkan"
-              templates={catalog.newest}
-              badge="newest"
+              title="Pilihan Desain"
+              subtitle="Semua desain undangan yang tersedia untuk Anda"
+              templates={catalog.all}
             />
             <CatalogSection
               title="Eksklusif"
-              subtitle="Koleksi premium dengan detail lebih istimewa"
+              subtitle="Koleksi paling langka — semakin jarang dipakai, semakin eksklusif"
               templates={catalog.exclusive}
               badge="exclusive"
             />

@@ -59,17 +59,32 @@ class TemplateCatalogTest extends TestCase
         return $template;
     }
 
-    public function test_catalog_groups_templates_correctly(): void
+    public function test_all_designs_lists_active_templates_newest_first(): void
     {
-        $exclusive = $this->makeTemplate(['name' => 'Exclusive One', 'tier' => 'exclusive']);
-        $this->makeTemplate(['name' => 'Inactive One', 'is_active' => false], invitationCount: 10);
+        $older = $this->makeTemplate(['name' => 'Older Design']);
+        $older->forceFill(['created_at' => now()->subDay()])->save();
+        $newer = $this->makeTemplate(['name' => 'Newer Design']);
+        $this->makeTemplate(['name' => 'Inactive One', 'is_active' => false]);
 
         $response = $this->getJson('/api/public/templates/catalog')->assertStatus(200);
 
-        $response->assertJsonPath('data.exclusive.0.id', $exclusive->id);
+        $response->assertJsonPath('data.all.0.id', $newer->id);
+        $response->assertJsonMissingPath('data.newest');
         $response->assertJsonMissingPath('data.best_sellers');
 
-        $names = collect($response->json('data.newest'))->pluck('name');
+        $names = collect($response->json('data.all'))->pluck('name');
         $this->assertNotContains('Inactive One', $names);
+    }
+
+    public function test_exclusive_is_ordered_by_fewest_uses_first(): void
+    {
+        $heavilyUsed = $this->makeTemplate(['name' => 'Popular Exclusive', 'tier' => 'exclusive'], invitationCount: 5);
+        $rare = $this->makeTemplate(['name' => 'Rare Exclusive', 'tier' => 'exclusive'], invitationCount: 0);
+        $this->makeTemplate(['name' => 'Standard One', 'tier' => 'standard']);
+
+        $response = $this->getJson('/api/public/templates/catalog')->assertStatus(200);
+
+        $response->assertJsonPath('data.exclusive.0.id', $rare->id);
+        $response->assertJsonPath('data.exclusive.1.id', $heavilyUsed->id);
     }
 }

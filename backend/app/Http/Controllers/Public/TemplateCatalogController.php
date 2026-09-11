@@ -12,22 +12,23 @@ class TemplateCatalogController extends Controller
 {
     use ApiResponses;
 
-    private const PER_SECTION = 8;
+    private const EXCLUSIVE_LIMIT = 8;
 
     public function index(): JsonResponse
     {
         $base = Template::query()->where('is_active', true)->withCount('invitations');
 
-        $newest = (clone $base)->latest('created_at')->limit(self::PER_SECTION)->get();
+        $allDesigns = (clone $base)->latest('created_at')->get();
 
+        // Fewer times used = rarer = more exclusive, so ascending order.
         $exclusive = (clone $base)
             ->where('tier', 'exclusive')
-            ->latest('created_at')
-            ->limit(self::PER_SECTION)
+            ->orderBy('invitations_count')
+            ->limit(self::EXCLUSIVE_LIMIT)
             ->get();
 
         return $this->success([
-            'newest' => TemplateCatalogResource::collection($newest),
+            'all' => TemplateCatalogResource::collection($allDesigns),
             'exclusive' => TemplateCatalogResource::collection($exclusive),
         ]);
     }

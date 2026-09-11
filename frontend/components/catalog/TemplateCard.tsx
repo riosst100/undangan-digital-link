@@ -3,7 +3,6 @@ import type { CatalogTemplate } from "@/types/catalog";
 import { formatIdr } from "@/lib/format";
 
 const BADGE_LABEL: Record<string, string> = {
-  newest: "Terbaru",
   exclusive: "Eksklusif",
 };
 
