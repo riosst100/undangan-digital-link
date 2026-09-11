@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\TemplateController as AdminTemplateController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Customer\InvitationController as CustomerInvitationController;
 use App\Http\Controllers\Public\InvitationController as PublicInvitationController;
@@ -27,7 +28,11 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware('can:admin')->prefix('admin')->group(function () {
-        // Customers, invitations oversight, template/theme management, AI generator.
+        Route::get('templates', [AdminTemplateController::class, 'index']);
+        Route::post('templates', [AdminTemplateController::class, 'store']);
+        Route::delete('templates/{template}', [AdminTemplateController::class, 'destroy']);
+
+        // Customers, invitations oversight, theme management, AI generator.
         // See docs/api.md — implemented incrementally in Phase 6.
     });
 

@@ -1,8 +1,12 @@
 import { getServerUser } from "@/lib/api/server-auth";
+import { serverFetch } from "@/lib/api/server-fetch";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { TemplateManager } from "@/components/admin/TemplateManager";
+import type { AdminTemplate } from "@/types/admin-template";
 
 export default async function AdminDashboardPage() {
   const user = await getServerUser();
+  const templates = (await serverFetch<AdminTemplate[]>("/api/admin/templates")) ?? [];
 
   return (
     <div className="min-h-dvh bg-zinc-50 p-8">
@@ -15,9 +19,10 @@ export default async function AdminDashboardPage() {
       </div>
 
       <p className="mt-6 text-sm text-zinc-600">
-        Customers, Invitations, Templates, Themes, Orders, Subscriptions, AI Generator,
-        Analytics, Settings.
+        Customers, Invitations, Themes, Orders, Subscriptions, AI Generator, Analytics, Settings.
       </p>
+
+      <TemplateManager initialTemplates={templates} />
     </div>
   );
 }

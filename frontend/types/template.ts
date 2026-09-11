@@ -14,6 +14,23 @@ export const SECTION_TYPES = [
 
 export type SectionType = (typeof SECTION_TYPES)[number];
 
+// Mirrors backend/config/templates.php `variants`. This is a UX allowlist
+// only (limits what the form offers) — the backend re-validates against its
+// own copy and is the actual security boundary. Keep both in sync.
+export const SECTION_VARIANTS: Record<SectionType, string[]> = {
+  cover: ["fullscreen", "minimal", "split"],
+  couple: ["classic", "editorial", "split"],
+  story: ["timeline", "cards"],
+  event: ["card", "minimal", "timeline"],
+  gallery: ["masonry", "grid", "carousel"],
+  rsvp: ["form", "simple"],
+  gift: ["default", "tabs"],
+  music: ["player-minimal", "player-floating"],
+  quote: ["default"],
+  closing: ["default", "signature"],
+  guest_greeting: ["default"],
+};
+
 export type SectionConfig = {
   type: SectionType;
   variant: string;
