@@ -22,14 +22,45 @@ type RequestOptions = {
   next?: NextFetchRequestConfig;
 };
 
+const MUTATING_METHODS = new Set(["POST", "PATCH", "PUT", "DELETE"]);
+
+function readXsrfTokenCookie(): string | null {
+  if (typeof document === "undefined") return null;
+
+  const match = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+/**
+ * Laravel Sanctum's SPA (cookie) auth requires a CSRF token on every
+ * mutating request. The token comes from the XSRF-TOKEN cookie, which the
+ * backend only sets once GET /sanctum/csrf-cookie has been hit — so on the
+ * browser's first mutating call in a session, fetch that first.
+ */
+async function ensureXsrfCookie(): Promise<string | null> {
+  const existing = readXsrfTokenCookie();
+  if (existing) return existing;
+
+  await fetch(`${API_BASE_URL}/sanctum/csrf-cookie`, { credentials: "include" });
+  return readXsrfTokenCookie();
+}
+
 export async function apiFetch<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const method = options.method ?? "GET";
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    ...(options.body ? { "Content-Type": "application/json" } : {}),
+    ...options.headers,
+  };
+
+  if (MUTATING_METHODS.has(method)) {
+    const xsrfToken = await ensureXsrfCookie();
+    if (xsrfToken) headers["X-XSRF-TOKEN"] = xsrfToken;
+  }
+
   const res = await fetch(`${API_BASE_URL}${path}`, {
-    method: options.method ?? "GET",
-    headers: {
-      Accept: "application/json",
-      ...(options.body ? { "Content-Type": "application/json" } : {}),
-      ...options.headers,
-    },
+    method,
+    headers,
     body: options.body ? JSON.stringify(options.body) : undefined,
     cache: options.cache,
     next: options.next,
