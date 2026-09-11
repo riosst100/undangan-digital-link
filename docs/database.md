@@ -74,15 +74,6 @@
   original_filename, mime_type, size_bytes, width, height, variants (jsonb —
   paths for webp/avif/thumbnail), timestamps, deleted_at
 
-### AI
-- **ai_generations** — id, user_id (fk), feature (enum: story_generate,
-  story_improve, quote, opening, closing, couple_bio, event_description,
-  whatsapp_message, template_generate, theme_generate, theme_modify),
-  provider, model, prompt (text), input (jsonb), output (jsonb), status
-  (enum: success, failed, rejected_validation), error_message (nullable),
-  source_type (nullable, e.g. "invitation", "template"), source_id
-  (nullable), version, created_at
-
 ### Commerce (schema-ready, minimal for MVP)
 - **subscriptions** — id, user_id (fk), plan, status, current_period_end,
   timestamps
@@ -114,7 +105,6 @@ templates 1───* template_versions
 themes 1───* theme_versions
 guests 1───* rsvps (nullable link)
 media 1───* gallery_items / couples / gift_accounts / music (fk usage)
-users 1───* ai_generations
 invitations 1───* analytics_events
 users 1───* subscriptions 1───* orders
 ```
@@ -125,4 +115,3 @@ users 1───* subscriptions 1───* orders
 - `guests.token` — unique index (guest personalization hot path)
 - `invitations.user_id`, `events.invitation_id`, `rsvps.invitation_id`,
   `analytics_events.invitation_id` — btree indexes for dashboard queries
-- `ai_generations(user_id, created_at)` — for history listing

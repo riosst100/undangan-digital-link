@@ -19,7 +19,7 @@ class InvitationController extends Controller
     {
         $invitation = Invitation::where('slug', $slug)
             ->where('status', 'published')
-            ->with(['couple', 'events', 'story.items', 'gallery.items.media', 'templateVersion', 'themeVersion'])
+            ->with(['couple', 'events', 'story.items', 'gallery.items.media', 'giftAccounts.qrisMedia', 'templateVersion', 'themeVersion'])
             ->first();
 
         if (! $invitation) {
@@ -27,29 +27,99 @@ class InvitationController extends Controller
         }
 
         $guestName = null;
+        $guestToken = null;
 
         if ($token = $request->query('to')) {
             $guest = Guest::where('invitation_id', $invitation->id)->where('token', $token)->first();
 
             if ($guest) {
                 $guestName = $guest->name;
+                $guestToken = $guest->token;
                 $guest->update(['opened_at' => $guest->opened_at ?? now()]);
             }
         }
 
         $couple = $invitation->couple;
+        $firstEvent = $invitation->events->first();
+        $sections = $invitation->templateVersion->schema['sections'] ?? [];
+        $quoteSection = collect($sections)->firstWhere('type', 'quote');
 
         return $this->success([
             'slug' => $invitation->slug,
             'status' => $invitation->status,
-            'sections' => $invitation->templateVersion->schema['sections'] ?? [],
+            'sections' => $sections,
             'theme' => $invitation->themeVersion->tokens,
             'content' => [
                 'cover' => [
                     'brideNickname' => $couple->bride_nickname ?? $couple->bride_name ?? '',
                     'groomNickname' => $couple->groom_nickname ?? $couple->groom_name ?? '',
-                    'eventDate' => optional($invitation->events->first())->date?->toDateString() ?? '',
+                    'eventDate' => $firstEvent?->date?->toDateString() ?? '',
                     'guestName' => $guestName,
+                ],
+                'couple' => [
+                    'bride' => [
+                        'name' => $couple->bride_name,
+                        'nickname' => $couple->bride_nickname,
+                        'parents' => $couple->bride_parents,
+                        'bio' => $couple->bride_bio,
+                        'photoUrl' => $couple->bridePhoto?->url(),
+                    ],
+                    'groom' => [
+                        'name' => $couple->groom_name,
+                        'nickname' => $couple->groom_nickname,
+                        'parents' => $couple->groom_parents,
+                        'bio' => $couple->groom_bio,
+                        'photoUrl' => $couple->groomPhoto?->url(),
+                    ],
+                ],
+                'event' => [
+                    'events' => $invitation->events->map(fn ($event) => [
+                        'type' => $event->type,
+                        'title' => $event->title,
+                        'date' => $event->date?->toDateString(),
+                        'startTime' => $event->start_time,
+                        'endTime' => $event->end_time,
+                        'venueName' => $event->venue_name,
+                        'address' => $event->address,
+                        'mapsUrl' => $event->maps_url,
+                        'description' => $event->description,
+                    ])->values(),
+                ],
+                'story' => [
+                    'title' => $invitation->story?->title,
+                    'items' => $invitation->story?->items->map(fn ($item) => [
+                        'year' => $item->year,
+                        'title' => $item->title,
+                        'description' => $item->description,
+                    ])->values() ?? [],
+                ],
+                'gallery' => [
+                    'items' => $invitation->gallery?->items->map(fn ($item) => [
+                        'url' => $item->media?->url(),
+                        'caption' => $item->caption,
+                    ])->values() ?? [],
+                ],
+                'rsvp' => [
+                    'invitationSlug' => $invitation->slug,
+                    'guestToken' => $guestToken,
+                ],
+                'gift' => [
+                    'accounts' => $invitation->giftAccounts->map(fn ($account) => [
+                        'bankName' => $account->bank_name,
+                        'accountNumber' => $account->account_number,
+                        'accountHolder' => $account->account_holder,
+                        'qrisUrl' => $account->qrisMedia?->url(),
+                    ])->values(),
+                ],
+                'quote' => [
+                    'text' => $quoteSection['settings']['text'] ?? null,
+                ],
+                'guest_greeting' => [
+                    'guestName' => $guestName,
+                ],
+                'closing' => [
+                    'brideNickname' => $couple->bride_nickname ?? $couple->bride_name ?? '',
+                    'groomNickname' => $couple->groom_nickname ?? $couple->groom_name ?? '',
                 ],
             ],
             'seo' => [

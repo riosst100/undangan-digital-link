@@ -69,18 +69,6 @@ POST   /api/public/invitations/{slug}/rsvp
 POST   /api/public/invitations/{slug}/track-view
 ```
 
-## AI (see docs/ai.md for payload schemas)
-```
-POST   /api/ai/story/generate
-POST   /api/ai/story/improve
-POST   /api/ai/quote/generate
-POST   /api/ai/opening/generate
-POST   /api/ai/closing/generate
-POST   /api/ai/couple-bio/generate
-POST   /api/ai/event-description/generate
-POST   /api/ai/whatsapp-message/generate
-```
-
 ## Admin
 ```
 GET    /api/admin/customers
@@ -99,11 +87,6 @@ POST   /api/admin/themes/{id}/versions
 PATCH  /api/admin/themes/{id}/versions/{versionId}
 POST   /api/admin/themes/{id}/versions/{versionId}/publish
 
-POST   /api/admin/ai/template/generate
-POST   /api/admin/ai/theme/generate
-POST   /api/admin/ai/theme/modify
-GET    /api/admin/ai/generations
-
 GET    /api/admin/analytics
 ```
 
@@ -114,6 +97,3 @@ Next.js does **not** implement its own API for business logic; it either:
    handlers, credentials via httpOnly cookie forwarded), or
 2. Acts as a thin proxy route handler when a browser-originated request
    needs cookie-based auth forwarding across the app/API domain split.
-
-No Next.js route ever embeds the Claude API key or talks to Anthropic
-directly.

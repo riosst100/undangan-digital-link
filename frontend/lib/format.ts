@@ -14,3 +14,7 @@ export function formatIdrAmount(amount: number): string {
     maximumFractionDigits: 0,
   }).format(amount);
 }
+
+export function formatDate(isoDate: string): string {
+  return new Intl.DateTimeFormat("id-ID", { dateStyle: "medium" }).format(new Date(isoDate));
+}

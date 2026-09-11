@@ -36,6 +36,22 @@ class TemplateManagementTest extends TestCase
             ->assertStatus(403);
     }
 
+    private function validTheme(): array
+    {
+        return [
+            'colors' => [
+                'primary' => '#C9A86A',
+                'secondary' => '#E8DCC8',
+                'background' => '#FBF7F0',
+                'surface' => '#FFFFFF',
+                'text' => '#302C27',
+                'muted' => '#81786E',
+            ],
+            'typography' => ['heading' => 'Playfair Display', 'body' => 'Inter'],
+            'animations' => ['preset' => 'fade-up'],
+        ];
+    }
+
     public function test_admin_can_create_template_with_initial_published_version(): void
     {
         $response = $this->actingAs($this->admin())->postJson('/api/admin/templates', [
@@ -48,15 +64,20 @@ class TemplateManagementTest extends TestCase
                 ['type' => 'cover', 'variant' => 'fullscreen', 'enabled' => true],
                 ['type' => 'couple', 'variant' => 'classic', 'enabled' => true],
             ],
+            'theme' => $this->validTheme(),
         ]);
 
         $response->assertStatus(201);
         $response->assertJsonPath('data.name', 'Rustic Charm');
         $response->assertJsonPath('data.latest_version.status', 'published');
         $response->assertJsonPath('data.latest_version.version', 1);
+        $response->assertJsonPath('data.theme.colors.primary', '#C9A86A');
+        $response->assertJsonPath('data.theme.animations.preset', 'fade-up');
 
         $this->assertDatabaseHas('templates', ['slug' => 'rustic-charm']);
         $this->assertDatabaseHas('template_versions', ['version' => 1, 'status' => 'published']);
+        $this->assertDatabaseHas('themes', ['slug' => 'rustic-charm']);
+        $this->assertDatabaseHas('theme_versions', ['version' => 1, 'status' => 'published']);
     }
 
     public function test_creating_template_rejects_unknown_variant(): void
@@ -69,6 +90,7 @@ class TemplateManagementTest extends TestCase
             'sections' => [
                 ['type' => 'cover', 'variant' => 'not-a-real-variant', 'enabled' => true],
             ],
+            'theme' => $this->validTheme(),
         ]);
 
         $response->assertStatus(422);
@@ -85,9 +107,50 @@ class TemplateManagementTest extends TestCase
             'sections' => [
                 ['type' => 'hacked_section', 'variant' => 'fullscreen', 'enabled' => true],
             ],
+            'theme' => $this->validTheme(),
         ]);
 
         $response->assertStatus(422);
+    }
+
+    public function test_creating_template_rejects_unknown_animation_preset(): void
+    {
+        $theme = $this->validTheme();
+        $theme['animations']['preset'] = 'explode';
+
+        $response = $this->actingAs($this->admin())->postJson('/api/admin/templates', [
+            'name' => 'Malicious',
+            'slug' => 'malicious-3',
+            'price' => 0,
+            'tier' => 'standard',
+            'sections' => [
+                ['type' => 'cover', 'variant' => 'fullscreen', 'enabled' => true],
+            ],
+            'theme' => $theme,
+        ]);
+
+        $response->assertStatus(422);
+        $this->assertDatabaseMissing('templates', ['slug' => 'malicious-3']);
+    }
+
+    public function test_creating_template_rejects_unknown_font(): void
+    {
+        $theme = $this->validTheme();
+        $theme['typography']['heading'] = 'Comic Sans MS';
+
+        $response = $this->actingAs($this->admin())->postJson('/api/admin/templates', [
+            'name' => 'Malicious',
+            'slug' => 'malicious-4',
+            'price' => 0,
+            'tier' => 'standard',
+            'sections' => [
+                ['type' => 'cover', 'variant' => 'fullscreen', 'enabled' => true],
+            ],
+            'theme' => $theme,
+        ]);
+
+        $response->assertStatus(422);
+        $this->assertDatabaseMissing('templates', ['slug' => 'malicious-4']);
     }
 
     public function test_admin_can_soft_delete_template(): void

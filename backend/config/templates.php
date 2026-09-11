@@ -8,32 +8,34 @@
 
 return [
 
+    // Only lists section types/variants that have a real React component in
+    // frontend/lib/template-engine/registry.ts. Keep this in lockstep with
+    // that file — an entry here with no matching component would let admins
+    // save a template that silently renders nothing for that section.
     'section_types' => [
         'cover',
         'couple',
-        'story',
         'event',
+        'story',
         'gallery',
         'rsvp',
         'gift',
-        'music',
         'quote',
-        'closing',
         'guest_greeting',
+        'closing',
     ],
 
     'variants' => [
-        'cover' => ['fullscreen', 'minimal', 'split'],
-        'couple' => ['classic', 'editorial', 'split'],
-        'story' => ['timeline', 'cards'],
-        'event' => ['card', 'minimal', 'timeline'],
-        'gallery' => ['masonry', 'grid', 'carousel'],
-        'rsvp' => ['form', 'simple'],
-        'gift' => ['default', 'tabs'],
-        'music' => ['player-minimal', 'player-floating'],
+        'cover' => ['fullscreen', 'minimal', 'arch'],
+        'couple' => ['classic', 'split', 'overlap'],
+        'event' => ['card', 'timeline', 'ornate'],
+        'story' => ['timeline'],
+        'gallery' => ['grid', 'masonry'],
+        'rsvp' => ['form'],
+        'gift' => ['default'],
         'quote' => ['default'],
-        'closing' => ['default', 'signature'],
         'guest_greeting' => ['default'],
+        'closing' => ['default'],
     ],
 
     // Allowlisted animation presets a theme may reference.

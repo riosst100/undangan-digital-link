@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\TemplateController as AdminTemplateController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Customer\InvitationController as CustomerInvitationController;
 use App\Http\Controllers\Public\InvitationController as PublicInvitationController;
 use App\Http\Controllers\Public\TemplateCatalogController;
+use App\Http\Controllers\Public\TemplatePreviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -32,18 +34,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('templates', [AdminTemplateController::class, 'store']);
         Route::delete('templates/{template}', [AdminTemplateController::class, 'destroy']);
 
-        // Customers, invitations oversight, theme management, AI generator.
-        // See docs/api.md — implemented incrementally in Phase 6.
-    });
+        Route::get('customers', [AdminCustomerController::class, 'index']);
 
-    Route::prefix('ai')->middleware('throttle:ai')->group(function () {
-        // Story/quote/opening/closing/couple-bio/event-description/whatsapp-message
-        // generation endpoints. See docs/ai.md — implemented in Phase 5.
+        // Invitations oversight, theme management. See docs/api.md — implemented incrementally in Phase 6.
     });
 });
 
 Route::prefix('public')->group(function () {
     Route::get('templates/catalog', [TemplateCatalogController::class, 'index']);
+    Route::get('templates/{slug}', [TemplatePreviewController::class, 'show']);
     Route::get('invitations/{slug}', [PublicInvitationController::class, 'show']);
     Route::post('invitations/{slug}/rsvp', [PublicInvitationController::class, 'rsvp']);
     Route::post('invitations/{slug}/track-view', [PublicInvitationController::class, 'trackView']);

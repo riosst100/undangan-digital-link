@@ -10,7 +10,6 @@ template + theme engine — no page building required.
 - **Backend**: Laravel, Sanctum, REST API — `backend/`
 - **Database**: PostgreSQL
 - **Storage**: Cloudflare R2 (S3-compatible)
-- **AI**: Anthropic Claude API, proxied exclusively through Laravel
 - **Deploy**: Ubuntu VPS — Nginx, PM2 (Next.js), PHP-FPM (Laravel). No Docker.
 
 ## Documentation
@@ -19,7 +18,6 @@ template + theme engine — no page building required.
 - [Database / ERD](docs/database.md)
 - [Template & Theme System](docs/template-system.md)
 - [API Design](docs/api.md)
-- [AI System](docs/ai.md)
 - [Deployment](docs/deployment.md)
 
 ## Local development
@@ -60,7 +58,7 @@ Frontend runs at `http://localhost:3000`, backend API at
 ```text
 undangan-digital/
 ├── frontend/    Next.js app (public invitations, customer dashboard, admin)
-├── backend/     Laravel API (auth, data, template/theme engine, AI proxy)
+├── backend/     Laravel API (auth, data, template/theme engine)
 ├── docs/        Architecture and design documentation
 ├── scripts/     Deployment/ops helper scripts
 └── .env.example Root-level reference for shared/deploy env vars

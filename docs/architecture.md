@@ -16,7 +16,7 @@ Cloudflare (CDN, DNS, TLS proxy)
 Nginx (reverse proxy, static assets)
    ├── Next.js  → PM2   (frontend: public invitations, customer app, admin UI)
    │
-   └── Laravel  → PHP-FPM (API: auth, data, template/theme engine, AI proxy)
+   └── Laravel  → PHP-FPM (API: auth, data, template/theme engine)
              │
              ├── PostgreSQL   (source of truth)
              ├── Redis        (optional: queue, cache, rate limiting)
@@ -30,15 +30,14 @@ No Docker. Both dev and production run natively.
 - **Next.js** owns rendering and UX: SSR/ISR for public invitation pages
   (SEO, speed, WhatsApp link previews), client-side wizard for the customer
   dashboard, admin UI.
-- **Laravel** owns business logic, persistence, authorization, and is the
-  only thing that talks to the Claude API. This keeps the Claude key off the
-  browser and keeps authorization enforcement server-side and centralized.
+- **Laravel** owns business logic, persistence, and authorization —
+  centralized server-side enforcement rather than trusting the client.
 - **PostgreSQL** for relational integrity (invitations belong to customers,
   templates are versioned, RSVPs belong to guests) — a good fit given the
   strongly relational domain model.
 - **Redis is optional** — introduced only when a concrete need appears
-  (queueing image processing jobs, AI rate limiting, caching public
-  invitation reads). Not required for MVP correctness.
+  (queueing image processing jobs, caching public invitation reads). Not
+  required for MVP correctness.
 
 ## 3. Request flow examples
 
@@ -60,21 +59,6 @@ Browser (dashboard)
       → FormRequest validation → Policy authorization → persist
     ← { success, data }
 ```
-
-### AI content generation
-```
-Browser → Next.js API route (thin proxy, forwards auth cookie/token)
-  → Laravel POST /api/ai/story/generate (Sanctum auth, rate limited)
-    → AiServiceInterface → ClaudeAiService → Anthropic API
-    ← raw model output
-  → Schema validation (Zod-equivalent on PHP side / custom validator)
-  → AiGeneration history record saved
-  ← { success, data: { title, content } }
-```
-
-The Claude API key lives only in Laravel's `.env`, read via `config/ai.php`.
-Next.js never holds it, not even in a server-only env var, to keep the trust
-boundary singular and auditable.
 
 ## 4. Template/Theme engine (see docs/template-system.md for schemas)
 

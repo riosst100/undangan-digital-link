@@ -1,4 +1,15 @@
 import type { SectionConfig, ThemeTokens } from "./template";
+import type {
+  CoupleContent,
+  EventContent,
+  StoryContent,
+  GalleryContent,
+  RsvpContent,
+  GiftContent,
+  QuoteContent,
+  GuestGreetingContent,
+  ClosingContent,
+} from "@/lib/template-engine/registry";
 
 export type PublicInvitation = {
   slug: string;
@@ -13,6 +24,15 @@ export type PublicInvitation = {
       coverPhotoUrl?: string;
       guestName?: string;
     };
+    couple?: CoupleContent;
+    event?: EventContent;
+    story?: StoryContent;
+    gallery?: GalleryContent;
+    rsvp?: RsvpContent;
+    gift?: GiftContent;
+    quote?: QuoteContent;
+    guest_greeting?: GuestGreetingContent;
+    closing?: ClosingContent;
     [key: string]: unknown;
   };
   seo: {

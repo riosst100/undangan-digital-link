@@ -12,6 +12,11 @@ class ThemeSchemaValidator
 {
     private const HEX_COLOR = '/^#[0-9a-fA-F]{6}$/';
 
+    // Only plain linear/radial gradients built from hex colors, percentages,
+    // and a small set of keywords/degrees — never `url()`, so this can't be
+    // used to load arbitrary external resources or inject unrelated CSS.
+    private const BACKGROUND_GRADIENT = '/^(linear|radial)-gradient\([a-zA-Z0-9#, .%()]+\)$/';
+
     /**
      * @param  array<string, mixed>  $config
      * @return array<string, mixed> the validated config
@@ -55,6 +60,12 @@ class ThemeSchemaValidator
 
             if (! in_array($config['animations']['preset'], $allowedPresets, true)) {
                 $this->reject("Animation preset '{$config['animations']['preset']}' is not allowed.");
+            }
+        }
+
+        if (isset($config['backgroundImage'])) {
+            if (! is_string($config['backgroundImage']) || ! preg_match(self::BACKGROUND_GRADIENT, $config['backgroundImage'])) {
+                $this->reject('backgroundImage must be a plain linear-gradient() or radial-gradient() value.');
             }
         }
 

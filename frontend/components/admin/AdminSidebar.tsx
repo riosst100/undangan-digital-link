@@ -27,7 +27,6 @@ const MENU_GROUPS: { label: string; items: { href: string; label: string }[] }[]
   {
     label: "Lainnya",
     items: [
-      { href: "/admin/ai", label: "AI Generator" },
       { href: "/admin/analytics", label: "Analytics" },
       { href: "/admin/settings", label: "Settings" },
     ],

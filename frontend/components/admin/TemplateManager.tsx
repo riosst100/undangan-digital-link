@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { deleteTemplate } from "@/lib/api/admin-templates";
 import { ApiError } from "@/lib/api/client";
-import { formatIdr, formatIdrAmount } from "@/lib/format";
+import { formatIdr } from "@/lib/format";
 import type { AdminTemplate } from "@/types/admin-template";
 import { CreateTemplateForm } from "./CreateTemplateForm";
 
@@ -46,6 +47,7 @@ export function TemplateManager({ initialTemplates }: { initialTemplates: AdminT
               <tr>
                 <th className="px-4 py-3">Nama</th>
                 <th className="px-4 py-3">Tier</th>
+                <th className="px-4 py-3">Tema</th>
                 <th className="px-4 py-3">Harga</th>
                 <th className="px-4 py-3">Penjualan</th>
                 <th className="px-4 py-3">Status</th>
@@ -60,9 +62,33 @@ export function TemplateManager({ initialTemplates }: { initialTemplates: AdminT
                     <p className="text-xs text-zinc-500">{template.slug}</p>
                   </td>
                   <td className="px-4 py-3 capitalize text-zinc-700">{template.tier}</td>
+                  <td className="px-4 py-3">
+                    {template.theme ? (
+                      <div className="flex items-center gap-2">
+                        <div className="flex -space-x-1">
+                          {[
+                            template.theme.colors.primary,
+                            template.theme.colors.secondary,
+                            template.theme.colors.background,
+                          ].map((color, i) => (
+                            <span
+                              key={i}
+                              className="h-4 w-4 rounded-full border border-white ring-1 ring-zinc-200"
+                              style={{ backgroundColor: color }}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-xs text-zinc-500">
+                          {template.theme.animations?.preset ?? "—"}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-zinc-400">—</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-zinc-700">{formatIdr(template.price)}</td>
                   <td className="px-4 py-3 text-zinc-700">
-                    {formatIdrAmount(template.price * (template.invitations_count ?? 0))}
+                    {new Intl.NumberFormat("id-ID").format(template.invitations_count ?? 0)}
                   </td>
                   <td className="px-4 py-3">
                     <span
@@ -74,14 +100,23 @@ export function TemplateManager({ initialTemplates }: { initialTemplates: AdminT
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(template)}
-                      disabled={deletingId === template.id}
-                      className="text-xs font-medium text-red-600 hover:text-red-700 disabled:opacity-50"
-                    >
-                      {deletingId === template.id ? "Menghapus..." : "Hapus"}
-                    </button>
+                    <div className="flex items-center justify-end gap-3">
+                      <Link
+                        href={`/templates/${template.slug}`}
+                        target="_blank"
+                        className="text-xs font-medium text-zinc-600 hover:text-zinc-900"
+                      >
+                        Lihat Demo
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(template)}
+                        disabled={deletingId === template.id}
+                        className="text-xs font-medium text-red-600 hover:text-red-700 disabled:opacity-50"
+                      >
+                        {deletingId === template.id ? "Menghapus..." : "Hapus"}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

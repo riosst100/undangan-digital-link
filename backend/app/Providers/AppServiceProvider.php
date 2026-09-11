@@ -3,8 +3,6 @@
 namespace App\Providers;
 
 use App\Models\User;
-use App\Services\Ai\AiServiceInterface;
-use App\Services\Ai\ClaudeAiService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
@@ -17,9 +15,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(AiServiceInterface::class, match (config('ai.provider')) {
-            default => ClaudeAiService::class,
-        });
+        //
     }
 
     /**
@@ -31,13 +27,6 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('api', function ($request) {
             return Limit::perMinute(120)->by($request->user()?->id ?: $request->ip());
-        });
-
-        RateLimiter::for('ai', function ($request) {
-            return Limit::perMinutes(
-                config('ai.rate_limit.decay_minutes'),
-                config('ai.rate_limit.max_attempts'),
-            )->by($request->user()?->id ?: $request->ip());
         });
     }
 }

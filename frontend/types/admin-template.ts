@@ -1,4 +1,4 @@
-import type { SectionType } from "./template";
+import type { SectionType, ThemeTokens } from "./template";
 
 export type AdminTemplateSection = {
   type: SectionType;
@@ -22,7 +22,21 @@ export type AdminTemplate = {
     status: string;
     schema: { sections: AdminTemplateSection[] };
   } | null;
+  theme: ThemeTokens | null;
   created_at: string;
+};
+
+export type CreateTemplateThemeInput = {
+  colors: {
+    primary: string;
+    secondary: string;
+    background: string;
+    surface: string;
+    text: string;
+    muted: string;
+  };
+  typography: { heading: string; body: string };
+  animations: { preset: string };
 };
 
 export type CreateTemplateInput = {
@@ -33,4 +47,5 @@ export type CreateTemplateInput = {
   tier: "standard" | "exclusive";
   thumbnail_url?: string;
   sections: { type: SectionType; variant: string; enabled: boolean }[];
+  theme: CreateTemplateThemeInput;
 };

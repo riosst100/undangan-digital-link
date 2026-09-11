@@ -41,8 +41,7 @@ Rules:
 - `variant` must be a registered variant for that `type` (allowlist).
 - `settings` is a small, per-variant-validated bag of primitive values only
   (numbers, strings, booleans) — never arbitrary code or markup.
-- Unknown `type`/`variant` combinations are rejected at save time (used for
-  both admin-authored and AI-generated templates).
+- Unknown `type`/`variant` combinations are rejected at save time.
 
 ### Registered section types & example variants (extensible)
 

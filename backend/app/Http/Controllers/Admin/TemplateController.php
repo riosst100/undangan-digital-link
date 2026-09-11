@@ -8,9 +8,11 @@ use App\Http\Requests\Admin\StoreTemplateRequest;
 use App\Http\Resources\Admin\TemplateResource;
 use App\Models\Template;
 use App\Models\TemplateVersion;
+use App\Models\Theme;
+use App\Models\ThemeVersion;
 use App\Services\Templates\TemplateSchemaValidator;
+use App\Services\Templates\ThemeSchemaValidator;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TemplateController extends Controller
@@ -28,8 +30,11 @@ class TemplateController extends Controller
         return $this->success(TemplateResource::collection($templates));
     }
 
-    public function store(StoreTemplateRequest $request, TemplateSchemaValidator $schemaValidator): JsonResponse
-    {
+    public function store(
+        StoreTemplateRequest $request,
+        TemplateSchemaValidator $templateValidator,
+        ThemeSchemaValidator $themeValidator,
+    ): JsonResponse {
         $sections = collect($request->input('sections'))
             ->map(fn (array $section) => [
                 'type' => $section['type'],
@@ -40,13 +45,22 @@ class TemplateController extends Controller
             ->values()
             ->all();
 
-        $schema = $schemaValidator->validate([
+        $templateSchema = $templateValidator->validate([
             'name' => $request->string('name')->toString(),
             'version' => 1,
             'sections' => $sections,
         ]);
 
-        $template = DB::transaction(function () use ($request, $schema) {
+        $themeSchema = $themeValidator->validate([
+            'name' => $request->string('name')->toString(),
+            'version' => 1,
+            'colors' => $request->input('theme.colors'),
+            'typography' => $request->input('theme.typography'),
+            'radius' => ['card' => '16px', 'button' => '999px'],
+            'animations' => $request->input('theme.animations'),
+        ]);
+
+        $template = DB::transaction(function () use ($request, $templateSchema, $themeSchema) {
             $template = Template::create([
                 'name' => $request->string('name'),
                 'slug' => $request->string('slug'),
@@ -61,7 +75,26 @@ class TemplateController extends Controller
             TemplateVersion::create([
                 'template_id' => $template->id,
                 'version' => 1,
-                'schema' => $schema,
+                'schema' => $templateSchema,
+                'status' => 'published',
+                'created_by' => $request->user()->id,
+            ]);
+
+            // Every template needs a matching theme (colors/typography/
+            // animations) for an invitation to be publishable — see
+            // docs/template-system.md §8. Created 1:1 here, keyed by the
+            // same slug, rather than requiring a separate admin step.
+            $theme = Theme::create([
+                'name' => $request->string('name'),
+                'slug' => $request->string('slug'),
+                'is_active' => true,
+                'created_by' => $request->user()->id,
+            ]);
+
+            ThemeVersion::create([
+                'theme_id' => $theme->id,
+                'version' => 1,
+                'tokens' => $themeSchema,
                 'status' => 'published',
                 'created_by' => $request->user()->id,
             ]);

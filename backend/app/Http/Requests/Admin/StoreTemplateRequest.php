@@ -16,6 +16,8 @@ class StoreTemplateRequest extends FormRequest
     public function rules(): array
     {
         $sectionTypes = config('templates.section_types');
+        $fonts = config('templates.fonts');
+        $animationPresets = config('templates.animation_presets');
 
         return [
             'name' => ['required', 'string', 'max:255'],
@@ -29,6 +31,16 @@ class StoreTemplateRequest extends FormRequest
             'sections.*.type' => ['required', 'string', Rule::in($sectionTypes)],
             'sections.*.variant' => ['required', 'string'],
             'sections.*.enabled' => ['sometimes', 'boolean'],
+
+            'theme.colors.primary' => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'theme.colors.secondary' => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'theme.colors.background' => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'theme.colors.surface' => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'theme.colors.text' => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'theme.colors.muted' => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'theme.typography.heading' => ['required', 'string', Rule::in($fonts)],
+            'theme.typography.body' => ['required', 'string', Rule::in($fonts)],
+            'theme.animations.preset' => ['required', 'string', Rule::in($animationPresets)],
         ];
     }
 

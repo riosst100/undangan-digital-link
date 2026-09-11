@@ -14,12 +14,16 @@ export function themeToCssVars(theme: ThemeTokens): CSSProperties {
     "--radius-card": theme.radius?.card ?? "16px",
     "--radius-button": theme.radius?.button ?? "999px",
     "--shadow-card": theme.shadows?.card ?? "none",
+    "--background-image": theme.backgroundImage ?? "none",
   } as CSSProperties;
 }
 
 export function ThemeProvider({ theme, children }: { theme: ThemeTokens; children: React.ReactNode }) {
   return (
-    <div style={themeToCssVars(theme)} className="bg-[var(--color-background)] text-[var(--color-text)]">
+    <div
+      style={themeToCssVars(theme)}
+      className="bg-[image:var(--background-image)] bg-[var(--color-background)] bg-fixed text-[var(--color-text)]"
+    >
       {children}
     </div>
   );

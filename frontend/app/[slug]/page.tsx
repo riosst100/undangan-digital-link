@@ -4,6 +4,7 @@ import { getPublicInvitation } from "@/lib/api/invitations";
 import { ApiError } from "@/lib/api/client";
 import { ThemeProvider } from "@/lib/template-engine/theme-provider";
 import { RenderSection } from "@/lib/template-engine/render-section";
+import { InvitationGate } from "@/components/invitation/InvitationGate";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -45,13 +46,15 @@ export default async function InvitationPage({ params, searchParams }: PageProps
 
   return (
     <ThemeProvider theme={invitation.theme}>
-      {invitation.sections.map((section, index) => (
-        <RenderSection
-          key={`${section.type}-${index}`}
-          section={section}
-          content={invitation.content[section.type] ?? invitation.content.cover}
-        />
-      ))}
+      <InvitationGate content={invitation.content.cover}>
+        {invitation.sections.map((section, index) => (
+          <RenderSection
+            key={`${section.type}-${index}`}
+            section={section}
+            content={invitation.content[section.type] ?? invitation.content.cover}
+          />
+        ))}
+      </InvitationGate>
     </ThemeProvider>
   );
 }
