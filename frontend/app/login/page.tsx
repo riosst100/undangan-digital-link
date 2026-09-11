@@ -1,12 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { login } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/client";
 
-export default function LoginPage() {
+function resolveRedirectTarget(raw: string | null, role: "admin" | "customer"): string {
+  const fallback = role === "admin" ? "/admin" : "/dashboard";
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return fallback;
+
+  const allowedPrefix = role === "admin" ? "/admin" : "/dashboard";
+  return raw.startsWith(allowedPrefix) ? raw : fallback;
+}
+
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +27,9 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const user = await login(email, password);
-      router.push(user.role === "admin" ? "/admin" : "/dashboard");
+      const redirectTarget = resolveRedirectTarget(searchParams.get("redirect"), user.role);
+      router.push(redirectTarget);
+      router.refresh();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Terjadi kesalahan. Silakan coba lagi.");
     } finally {
@@ -58,5 +69,13 @@ export default function LoginPage() {
         </button>
       </form>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }
