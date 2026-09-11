@@ -30,7 +30,9 @@ export default function RegisterPage() {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-[#FBF7F0] px-6">
       <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4 rounded-2xl bg-white p-8 shadow-sm">
-        <h1 className="text-xl font-medium text-[#302C27]">Daftar</h1>
+        <h1 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-[#302C27]">
+          Daftar
+        </h1>
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
         <input
           type="text"
