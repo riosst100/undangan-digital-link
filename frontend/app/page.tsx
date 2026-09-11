@@ -7,7 +7,9 @@ import type { TemplateCatalog } from "@/types/catalog";
 
 async function loadCatalog(): Promise<TemplateCatalog | null> {
   try {
-    return await getTemplateCatalog();
+    const catalog = await getTemplateCatalog();
+    if (!Array.isArray(catalog?.all) || !Array.isArray(catalog?.exclusive)) return null;
+    return catalog;
   } catch {
     return null;
   }
@@ -15,7 +17,7 @@ async function loadCatalog(): Promise<TemplateCatalog | null> {
 
 export default async function Home() {
   const catalog = await loadCatalog();
-  const hasCatalog = catalog && (catalog.all.length > 0 || catalog.exclusive.length > 0);
+  const hasCatalog = catalog !== null && (catalog.all.length > 0 || catalog.exclusive.length > 0);
 
   return (
     <div className="flex min-h-dvh flex-col bg-[#FBF7F0] text-[#302C27]">
