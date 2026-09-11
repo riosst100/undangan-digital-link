@@ -12,6 +12,5 @@ export type CatalogTemplate = {
 
 export type TemplateCatalog = {
   newest: CatalogTemplate[];
-  best_sellers: CatalogTemplate[];
   exclusive: CatalogTemplate[];
 };

@@ -10,7 +10,7 @@ export function CatalogSection({
   title: string;
   subtitle?: string;
   templates: CatalogTemplate[];
-  badge: "newest" | "best_seller" | "exclusive";
+  badge: "newest" | "exclusive";
 }) {
   if (templates.length === 0) return null;
 

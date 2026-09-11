@@ -4,7 +4,6 @@ import { formatIdr } from "@/lib/format";
 
 const BADGE_LABEL: Record<string, string> = {
   newest: "Terbaru",
-  best_seller: "Terlaris",
   exclusive: "Eksklusif",
 };
 

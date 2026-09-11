@@ -61,14 +61,13 @@ class TemplateCatalogTest extends TestCase
 
     public function test_catalog_groups_templates_correctly(): void
     {
-        $popular = $this->makeTemplate(['name' => 'Popular One'], invitationCount: 5);
         $exclusive = $this->makeTemplate(['name' => 'Exclusive One', 'tier' => 'exclusive']);
         $this->makeTemplate(['name' => 'Inactive One', 'is_active' => false], invitationCount: 10);
 
         $response = $this->getJson('/api/public/templates/catalog')->assertStatus(200);
 
-        $response->assertJsonPath('data.best_sellers.0.id', $popular->id);
         $response->assertJsonPath('data.exclusive.0.id', $exclusive->id);
+        $response->assertJsonMissingPath('data.best_sellers');
 
         $names = collect($response->json('data.newest'))->pluck('name');
         $this->assertNotContains('Inactive One', $names);

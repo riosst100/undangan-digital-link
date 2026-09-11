@@ -15,8 +15,7 @@ async function loadCatalog(): Promise<TemplateCatalog | null> {
 
 export default async function Home() {
   const catalog = await loadCatalog();
-  const hasCatalog =
-    catalog && (catalog.newest.length > 0 || catalog.best_sellers.length > 0 || catalog.exclusive.length > 0);
+  const hasCatalog = catalog && (catalog.newest.length > 0 || catalog.exclusive.length > 0);
 
   return (
     <div className="flex min-h-dvh flex-col bg-[#FBF7F0] text-[#302C27]">
@@ -32,12 +31,6 @@ export default async function Home() {
               subtitle="Desain terbaru yang baru saja kami tambahkan"
               templates={catalog.newest}
               badge="newest"
-            />
-            <CatalogSection
-              title="Terlaris"
-              subtitle="Paling banyak dipilih oleh pasangan lain"
-              templates={catalog.best_sellers}
-              badge="best_seller"
             />
             <CatalogSection
               title="Eksklusif"

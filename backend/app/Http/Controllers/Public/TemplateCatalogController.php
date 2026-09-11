@@ -20,13 +20,6 @@ class TemplateCatalogController extends Controller
 
         $newest = (clone $base)->latest('created_at')->limit(self::PER_SECTION)->get();
 
-        $bestSellers = (clone $base)
-            ->orderByDesc('invitations_count')
-            ->get()
-            ->filter(fn (Template $template) => $template->invitations_count > 0)
-            ->take(self::PER_SECTION)
-            ->values();
-
         $exclusive = (clone $base)
             ->where('tier', 'exclusive')
             ->latest('created_at')
@@ -35,7 +28,6 @@ class TemplateCatalogController extends Controller
 
         return $this->success([
             'newest' => TemplateCatalogResource::collection($newest),
-            'best_sellers' => TemplateCatalogResource::collection($bestSellers),
             'exclusive' => TemplateCatalogResource::collection($exclusive),
         ]);
     }
