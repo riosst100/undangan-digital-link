@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { deleteTemplate } from "@/lib/api/admin-templates";
 import { ApiError } from "@/lib/api/client";
-import { formatIdr } from "@/lib/format";
+import { formatIdr, formatIdrAmount } from "@/lib/format";
 import type { AdminTemplate } from "@/types/admin-template";
 import { CreateTemplateForm } from "./CreateTemplateForm";
 
@@ -47,7 +47,7 @@ export function TemplateManager({ initialTemplates }: { initialTemplates: AdminT
                 <th className="px-4 py-3">Nama</th>
                 <th className="px-4 py-3">Tier</th>
                 <th className="px-4 py-3">Harga</th>
-                <th className="px-4 py-3">Dipakai</th>
+                <th className="px-4 py-3">Penjualan</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3" />
               </tr>
@@ -61,7 +61,9 @@ export function TemplateManager({ initialTemplates }: { initialTemplates: AdminT
                   </td>
                   <td className="px-4 py-3 capitalize text-zinc-700">{template.tier}</td>
                   <td className="px-4 py-3 text-zinc-700">{formatIdr(template.price)}</td>
-                  <td className="px-4 py-3 text-zinc-700">{template.invitations_count ?? 0}x</td>
+                  <td className="px-4 py-3 text-zinc-700">
+                    {formatIdrAmount(template.price * (template.invitations_count ?? 0))}
+                  </td>
                   <td className="px-4 py-3">
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs font-medium ${
