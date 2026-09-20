@@ -212,6 +212,34 @@ class DatabaseSeeder extends Seeder
                     ['type' => 'closing', 'variant' => 'default'],
                 ],
             ],
+            [
+                'name' => 'Floral Romance',
+                'slug' => 'floral-romance',
+                'price' => 225_000,
+                'tier' => 'exclusive',
+                'thumbnail_url' => 'https://images.unsplash.com/photo-1670529776180-60e4132ab90c?auto=format&fit=crop&w=800&q=80',
+                'colors' => [
+                    'primary' => '#B8637A', 'secondary' => '#F3DDE1', 'background' => '#FFF8F4',
+                    'surface' => '#FFFFFF', 'text' => '#3B2A2E', 'muted' => '#9C8189',
+                ],
+                'backgroundImage' => 'linear-gradient(180deg, #FFFBF8 0%, #FDEEF1 50%, #F7DEE3 100%)',
+                'typography' => ['heading' => 'Cormorant Garamond', 'body' => 'Inter'],
+                'animation' => 'fade-up',
+                'sections' => [
+                    ['type' => 'cover', 'variant' => 'arch'],
+                    ['type' => 'guest_greeting', 'variant' => 'default'],
+                    ['type' => 'couple', 'variant' => 'overlap'],
+                    ['type' => 'story', 'variant' => 'timeline'],
+                    ['type' => 'event', 'variant' => 'ornate'],
+                    ['type' => 'gallery', 'variant' => 'masonry'],
+                    ['type' => 'quote', 'variant' => 'default', 'settings' => [
+                        'text' => 'Kasih itu sabar, kasih itu murah hati, ia tidak cemburu, ia tidak memegahkan diri dan tidak sombong.',
+                    ]],
+                    ['type' => 'gift', 'variant' => 'default'],
+                    ['type' => 'rsvp', 'variant' => 'form'],
+                    ['type' => 'closing', 'variant' => 'default'],
+                ],
+            ],
         ];
     }
 
@@ -228,6 +256,7 @@ class DatabaseSeeder extends Seeder
                 'created_by' => $admin->id,
                 'price' => $definition['price'],
                 'tier' => $definition['tier'],
+                'thumbnail_url' => $definition['thumbnail_url'] ?? null,
             ],
         );
 

@@ -13,6 +13,7 @@ export const DUMMY_INVITATION_CONTENT: Record<SectionType, unknown> = {
     groomNickname: "Andy",
     eventDate: "12 Desember 2026",
     guestName: "Tamu Undangan",
+    coverPhotoUrl: "https://images.unsplash.com/photo-1522231192900-4fbd354ff773?auto=format&fit=crop&w=1200&q=80",
   },
   couple: {
     bride: {
@@ -20,12 +21,14 @@ export const DUMMY_INVITATION_CONTENT: Record<SectionType, unknown> = {
       nickname: "Sinta",
       parents: "Putri dari Bapak Hendra & Ibu Rina",
       bio: "Anak kedua dari dua bersaudara.",
+      photoUrl: "https://images.unsplash.com/photo-1700811489534-cef63289689d?auto=format&fit=crop&w=800&q=80",
     },
     groom: {
       name: "Andy Saputra",
       nickname: "Andy",
       parents: "Putra dari Bapak Bambang & Ibu Wati",
       bio: "Anak pertama dari tiga bersaudara.",
+      photoUrl: "https://images.unsplash.com/photo-1732159488321-ffa71052091e?auto=format&fit=crop&w=800&q=80",
     },
   },
   event: {
@@ -61,7 +64,20 @@ export const DUMMY_INVITATION_CONTENT: Record<SectionType, unknown> = {
     ],
   },
   gallery: {
-    items: [{ caption: "Foto 1" }, { caption: "Foto 2" }, { caption: "Foto 3" }],
+    items: [
+      {
+        caption: "Foto 1",
+        url: "https://images.unsplash.com/photo-1670529776180-60e4132ab90c?auto=format&fit=crop&w=800&q=80",
+      },
+      {
+        caption: "Foto 2",
+        url: "https://images.unsplash.com/photo-1751257547111-9641cb540f4d?auto=format&fit=crop&w=800&q=80",
+      },
+      {
+        caption: "Foto 3",
+        url: "https://images.unsplash.com/reserve/xd45Y326SvKzSR3Nanc8_MRJ_8125-1.jpg?auto=format&fit=crop&w=800&q=80",
+      },
+    ],
   },
   rsvp: {
     invitationSlug: "demo",
