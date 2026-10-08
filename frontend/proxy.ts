@@ -32,14 +32,14 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // /admin/login is reachable by anyone (it's the admin sign-in page
-  // itself) — everything else under /admin, plus all of /dashboard,
-  // requires a session.
+  // itself) — everything else under /admin, plus all of /dashboard and
+  // /buku-tamu, requires a session.
   if (pathname === "/admin/login") {
     return NextResponse.next();
   }
 
   const isAdminRoute = pathname.startsWith("/admin");
-  const isDashboardRoute = pathname.startsWith("/dashboard");
+  const isDashboardRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/buku-tamu");
 
   const user = await getSessionUser(request);
 
@@ -67,5 +67,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*"],
+  matcher: ["/dashboard/:path*", "/buku-tamu/:path*", "/admin/:path*"],
 };

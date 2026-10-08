@@ -1,14 +1,11 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { login, logout } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/client";
-
-function resolveRedirectTarget(raw: string | null): string {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/dashboard";
-  return raw.startsWith("/dashboard") ? raw : "/dashboard";
-}
+import { resolveRedirectTarget, withRedirect } from "@/lib/auth-redirect";
 
 function LoginForm() {
   const router = useRouter();
@@ -74,6 +71,12 @@ function LoginForm() {
         >
           {loading ? "Memproses..." : "Masuk"}
         </button>
+        <p className="text-center text-sm text-[#81786E]">
+          Belum punya akun?{" "}
+          <Link href={withRedirect("/register", searchParams.get("redirect"))} className="font-medium text-[#302C27] underline">
+            Daftar
+          </Link>
+        </p>
       </form>
     </div>
   );

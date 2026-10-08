@@ -50,6 +50,7 @@ PUT    /api/customer/invitations/{id}/music
 
 GET    /api/customer/invitations/{id}/guests
 POST   /api/customer/invitations/{id}/guests
+PATCH  /api/customer/invitations/{id}/guests/{guestId}
 DELETE /api/customer/invitations/{id}/guests/{guestId}
 
 GET    /api/customer/invitations/{id}/rsvps

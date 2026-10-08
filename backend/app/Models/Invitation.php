@@ -17,6 +17,7 @@ class Invitation extends Model
     protected $fillable = [
         'user_id', 'slug', 'template_id', 'template_version_id',
         'theme_id', 'theme_version_id', 'status', 'published_at',
+        'share_template', 'share_message',
     ];
 
     protected function casts(): array

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\TemplateController as AdminTemplateController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Customer\GuestController as CustomerGuestController;
 use App\Http\Controllers\Customer\InvitationController as CustomerInvitationController;
 use App\Http\Controllers\Public\InvitationController as PublicInvitationController;
 use App\Http\Controllers\Public\TemplateCatalogController;
@@ -25,7 +26,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('invitations/{invitation}/publish', [CustomerInvitationController::class, 'publish']);
         Route::post('invitations/{invitation}/unpublish', [CustomerInvitationController::class, 'unpublish']);
 
-        // Couple/events/story/gallery/gift/music sub-resources and guests/rsvps
+        Route::scopeBindings()->group(function () {
+            Route::get('invitations/{invitation}/guests', [CustomerGuestController::class, 'index']);
+            Route::post('invitations/{invitation}/guests', [CustomerGuestController::class, 'store']);
+            Route::patch('invitations/{invitation}/guests/{guest}', [CustomerGuestController::class, 'update']);
+            Route::delete('invitations/{invitation}/guests/{guest}', [CustomerGuestController::class, 'destroy']);
+        });
+
+        // Couple/events/story/gallery/gift/music sub-resources and rsvps
         // listing are implemented incrementally in Phase 4.
     });
 

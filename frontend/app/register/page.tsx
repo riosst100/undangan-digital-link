@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { register } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/client";
+import { resolveRedirectTarget, withRedirect } from "@/lib/auth-redirect";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +22,8 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await register(name, email, password);
-      router.push("/dashboard");
+      router.push(resolveRedirectTarget(searchParams.get("redirect")));
+      router.refresh();
     } catch (err) {
       setError(
         err instanceof ApiError
@@ -70,7 +74,21 @@ export default function RegisterPage() {
         >
           {loading ? "Memproses..." : "Daftar"}
         </button>
+        <p className="text-center text-sm text-[#81786E]">
+          Sudah punya akun?{" "}
+          <Link href={withRedirect("/login", searchParams.get("redirect"))} className="font-medium text-[#302C27] underline">
+            Masuk
+          </Link>
+        </p>
       </form>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterForm />
+    </Suspense>
   );
 }

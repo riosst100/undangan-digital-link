@@ -21,7 +21,7 @@ class Guest extends Model
         return ['opened_at' => 'datetime'];
     }
 
-    public static function bootGuest(): void
+    protected static function booted(): void
     {
         static::creating(function (self $guest) {
             if (empty($guest->token)) {

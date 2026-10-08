@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getServerUser } from "@/lib/api/server-auth";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 
@@ -13,7 +14,15 @@ export default async function DashboardPage() {
           </h1>
           {user ? <p className="mt-1 text-sm text-[#81786E]">Masuk sebagai {user.name}</p> : null}
         </div>
-        <LogoutButton />
+        <div className="flex items-center gap-2">
+          <Link
+            href="/buku-tamu"
+            className="rounded-full bg-[#C9A86A] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#b8975a]"
+          >
+            Buku Tamu
+          </Link>
+          <LogoutButton />
+        </div>
       </div>
 
       <p className="mt-6 text-sm text-[#81786E]">

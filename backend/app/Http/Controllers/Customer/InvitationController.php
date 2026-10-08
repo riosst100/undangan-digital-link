@@ -19,7 +19,7 @@ class InvitationController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $invitations = $request->user()->invitations()->latest()->get();
+        $invitations = $request->user()->invitations()->with('couple')->latest()->get();
 
         return $this->success(InvitationResource::collection($invitations));
     }
@@ -56,6 +56,8 @@ class InvitationController extends Controller
 
         $validated = $request->validate([
             'slug' => ['sometimes', 'string', 'alpha_dash', 'max:100', 'unique:invitations,slug,'.$invitation->id],
+            'share_template' => ['sometimes', 'nullable', 'string', 'max:50'],
+            'share_message' => ['sometimes', 'nullable', 'string', 'max:5000'],
         ]);
 
         $invitation->update($validated);
