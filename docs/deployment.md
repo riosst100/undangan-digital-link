@@ -2,7 +2,7 @@
 
 ## Current production (Docker)
 
-https://undangan-digital.link runs on the shared VPS with `docker-compose.prod.yml` (from `/var/www/undangan-digital`):
+https://catalog.undangan-digital.link (apex + www redirect there) runs on the shared VPS with `docker-compose.prod.yml` (from `/var/www/undangan-digital`):
 
 - `db` (PostgreSQL 16), `backend` (PHP-FPM 8.3, code bind-mounted), `nginx` (Laravel on `127.0.0.1:8070`),
   `frontend` (Next.js production build on `127.0.0.1:3070`).

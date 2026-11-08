@@ -1,4 +1,4 @@
-# Production: https://undangan-digital.link (Caddy on the host -> frontend 127.0.0.1:3070, API 127.0.0.1:8070).
+# Production: https://catalog.undangan-digital.link (Caddy on the host -> frontend 127.0.0.1:3070, API 127.0.0.1:8070).
 #   ./deploy.sh         pull master, rebuild, restart
 # Secrets come from .env next to this file (see .env.prod.example). docker-compose.yml is the dev stack.
 name: undangan
@@ -39,10 +39,10 @@ services:
       APP_ENV: production
       APP_DEBUG: "false"
       LOG_LEVEL: warning
-      APP_URL: https://undangan-digital.link
-      FRONTEND_URL: https://undangan-digital.link
-      SANCTUM_STATEFUL_DOMAINS: undangan-digital.link
-      SESSION_DOMAIN: undangan-digital.link
+      APP_URL: https://catalog.undangan-digital.link
+      FRONTEND_URL: https://catalog.undangan-digital.link
+      SANCTUM_STATEFUL_DOMAINS: catalog.undangan-digital.link
+      SESSION_DOMAIN: catalog.undangan-digital.link
       SESSION_SECURE_COOKIE: "true"
       DB_CONNECTION: pgsql
       DB_HOST: db
@@ -79,8 +79,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.prod
       args:
-        NEXT_PUBLIC_APP_URL: https://undangan-digital.link
-        NEXT_PUBLIC_API_URL: https://undangan-digital.link
+        NEXT_PUBLIC_APP_URL: https://catalog.undangan-digital.link
+        NEXT_PUBLIC_API_URL: https://catalog.undangan-digital.link
     image: undangan-frontend:prod
     container_name: undangan-frontend
     restart: unless-stopped

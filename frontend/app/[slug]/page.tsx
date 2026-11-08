@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: invitation.seo.title,
       description: invitation.seo.description,
       images: invitation.seo.ogImageUrl ? [invitation.seo.ogImageUrl] : undefined,
-      url: `https://undangan-digital.link/${invitation.slug}`,
+      url: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://catalog.undangan-digital.link"}/${invitation.slug}`,
     },
   };
 }
