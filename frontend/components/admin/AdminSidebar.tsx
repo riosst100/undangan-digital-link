@@ -25,6 +25,10 @@ const MENU_GROUPS: { label: string; items: { href: string; label: string }[] }[]
     ],
   },
   {
+    label: "Alat",
+    items: [{ href: "/admin/undangan-tahlil", label: "Undangan Tahlil" }],
+  },
+  {
     label: "Lainnya",
     items: [
       { href: "/admin/analytics", label: "Analytics" },

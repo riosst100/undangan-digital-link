@@ -10,11 +10,18 @@ function resolveRedirectTarget(raw: string | null): string {
   return raw.startsWith("/admin") ? raw : "/admin/dashboard";
 }
 
+// Seeded demo admin (backend DatabaseSeeder), prefilled only in `next dev` so
+// production builds never ship these strings.
+const DEV_CREDENTIALS =
+  process.env.NODE_ENV === "development"
+    ? { email: "admin@undangan-digital.link", password: "password" }
+    : { email: "", password: "" };
+
 function AdminLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(DEV_CREDENTIALS.email);
+  const [password, setPassword] = useState(DEV_CREDENTIALS.password);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 

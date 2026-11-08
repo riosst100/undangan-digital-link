@@ -82,7 +82,7 @@ async function doFetch(path: string, method: string, options: RequestOptions, xs
   });
 }
 
-export async function apiFetch<T>(path: string, options: RequestOptions = {}): Promise<T> {
+async function fetchWithCsrf(path: string, options: RequestOptions): Promise<Response> {
   const method = options.method ?? "GET";
   const isMutating = MUTATING_METHODS.has(method);
 
@@ -96,5 +96,29 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     res = await doFetch(path, method, options, await ensureXsrfCookie(true));
   }
 
-  return parseApiResponse<T>(res);
+  return res;
+}
+
+export async function apiFetch<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  return parseApiResponse<T>(await fetchWithCsrf(path, options));
+}
+
+/**
+ * For endpoints that return a file (e.g. a generated PDF) on success and the
+ * usual JSON envelope on failure.
+ */
+export async function apiFetchBlob(
+  path: string,
+  options: RequestOptions = {},
+): Promise<{ blob: Blob; filename: string | null }> {
+  const res = await fetchWithCsrf(path, options);
+
+  if (!res.ok) {
+    await parseApiResponse<never>(res);
+  }
+
+  const disposition = res.headers.get("Content-Disposition") ?? "";
+  const filename = disposition.match(/filename="?([^";]+)"?/)?.[1] ?? null;
+
+  return { blob: await res.blob(), filename };
 }

@@ -1,11 +1,14 @@
 <?php
 
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
+use App\Http\Controllers\Admin\TahlilInvitationController;
+use App\Http\Controllers\Admin\TahlilSubmissionController as AdminTahlilSubmissionController;
 use App\Http\Controllers\Admin\TemplateController as AdminTemplateController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Customer\GuestController as CustomerGuestController;
 use App\Http\Controllers\Customer\InvitationController as CustomerInvitationController;
 use App\Http\Controllers\Public\InvitationController as PublicInvitationController;
+use App\Http\Controllers\Public\TahlilSubmissionController as PublicTahlilSubmissionController;
 use App\Http\Controllers\Public\TemplateCatalogController;
 use App\Http\Controllers\Public\TemplatePreviewController;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +47,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('customers', [AdminCustomerController::class, 'index']);
 
+        Route::post('tahlil-invitations/pdf', [TahlilInvitationController::class, 'pdf']);
+        Route::get('tahlil-submissions', [AdminTahlilSubmissionController::class, 'index']);
+        Route::get('tahlil-submissions/{submission}', [AdminTahlilSubmissionController::class, 'show'])->whereUuid('submission');
+        Route::patch('tahlil-submissions/{submission}', [AdminTahlilSubmissionController::class, 'update'])->whereUuid('submission');
+        Route::delete('tahlil-submissions/{submission}', [AdminTahlilSubmissionController::class, 'destroy'])->whereUuid('submission');
+        Route::get('tahlil-submissions/{submission}/pdf', [AdminTahlilSubmissionController::class, 'pdf'])->whereUuid('submission');
+
         // Invitations oversight, theme management. See docs/api.md — implemented incrementally in Phase 6.
     });
 });
@@ -54,4 +64,7 @@ Route::prefix('public')->group(function () {
     Route::get('invitations/{slug}', [PublicInvitationController::class, 'show']);
     Route::post('invitations/{slug}/rsvp', [PublicInvitationController::class, 'rsvp']);
     Route::post('invitations/{slug}/track-view', [PublicInvitationController::class, 'trackView']);
+
+    // Unauthenticated, stores a row per call: keep it tightly throttled per IP.
+    Route::post('tahlil-submissions', [PublicTahlilSubmissionController::class, 'store'])->middleware('throttle:5,1');
 });
