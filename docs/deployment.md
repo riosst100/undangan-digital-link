@@ -1,4 +1,19 @@
-# Deployment — Ubuntu VPS (no Docker)
+# Deployment
+
+## Current production (Docker)
+
+https://undangan-digital.link runs on the shared VPS with `docker-compose.prod.yml` (from `/var/www/undangan-digital`):
+
+- `db` (PostgreSQL 16), `backend` (PHP-FPM 8.3, code bind-mounted), `nginx` (Laravel on `127.0.0.1:8070`),
+  `frontend` (Next.js production build on `127.0.0.1:3070`).
+- Caddy on the host terminates HTTPS and serves one origin: `/api`, `/sanctum`, `/storage`, `/up` go to Laravel,
+  everything else to Next.js (so the Sanctum session cookie needs no cross-site setup). `www` redirects to the apex.
+- Secrets: `.env` next to the compose file (`DB_PASSWORD`, optional R2 keys; see `.env.prod.example`). Uploads use
+  the local `public` disk until R2 is configured.
+- Deploy: `./deploy.sh` (pull `master`, rebuild, restart). The backend entrypoint runs composer, migrations and
+  `artisan optimize` on every start.
+
+The plan below (Nginx + PM2 + PHP-FPM without Docker) is the original design and still works on a dedicated server.
 
 ## Target architecture
 

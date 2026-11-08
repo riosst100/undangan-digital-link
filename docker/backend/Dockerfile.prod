@@ -1,0 +1,23 @@
+# Production backend: PHP-FPM 8.3 behind docker/nginx (docker-compose.prod.yml). Code is bind-mounted.
+FROM php:8.3-fpm-bookworm
+
+COPY --from=mlocati/php-extension-installer:2.7 /usr/bin/install-php-extensions /usr/local/bin/
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+
+RUN apt-get update && apt-get install -y --no-install-recommends git unzip postgresql-client \
+    && rm -rf /var/lib/apt/lists/* \
+    && install-php-extensions pdo_pgsql pgsql gd zip intl bcmath pcntl exif opcache
+
+RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini \
+    && printf 'upload_max_filesize=20M\npost_max_size=24M\nmemory_limit=256M\nexpose_php=Off\n' > /usr/local/etc/php/conf.d/zz-app.ini \
+    && printf 'opcache.enable=1\nopcache.enable_cli=1\nopcache.memory_consumption=128\nopcache.max_accelerated_files=20000\nopcache.validate_timestamps=0\n' > /usr/local/etc/php/conf.d/zz-opcache.ini \
+    && printf '[www]\npm = dynamic\npm.max_children = 8\npm.start_servers = 2\npm.min_spare_servers = 1\npm.max_spare_servers = 4\npm.max_requests = 500\nclear_env = no\n' > /usr/local/etc/php-fpm.d/zz-app.conf
+
+COPY entrypoint.prod.sh /usr/local/bin/backend-entrypoint
+RUN sed -i 's/\r$//' /usr/local/bin/backend-entrypoint && chmod +x /usr/local/bin/backend-entrypoint
+
+ENV COMPOSER_HOME=/tmp/composer HOME=/tmp
+WORKDIR /app
+EXPOSE 9000
+ENTRYPOINT ["backend-entrypoint"]
+CMD ["php-fpm", "-F"]

@@ -1,0 +1,97 @@
+# Production: https://undangan-digital.link (Caddy on the host -> frontend 127.0.0.1:3070, API 127.0.0.1:8070).
+#   ./deploy.sh         pull master, rebuild, restart
+# Secrets come from .env next to this file (see .env.prod.example). docker-compose.yml is the dev stack.
+name: undangan
+
+x-logging: &logging
+  driver: json-file
+  options: { max-size: "10m", max-file: "5" }
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: undangan-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: undangan_digital
+      POSTGRES_USER: undangan_app
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U undangan_app -d undangan_digital"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    logging: *logging
+
+  backend:
+    build:
+      context: ./docker/backend
+      dockerfile: Dockerfile.prod
+    image: undangan-backend:prod
+    container_name: undangan-backend
+    restart: unless-stopped
+    user: "1000:1000"
+    volumes:
+      - ./backend:/app
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      LOG_LEVEL: warning
+      APP_URL: https://undangan-digital.link
+      FRONTEND_URL: https://undangan-digital.link
+      SANCTUM_STATEFUL_DOMAINS: undangan-digital.link
+      SESSION_DOMAIN: undangan-digital.link
+      SESSION_SECURE_COOKIE: "true"
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_DATABASE: undangan_digital
+      DB_USERNAME: undangan_app
+      DB_PASSWORD: ${DB_PASSWORD}
+      # Local disk until Cloudflare R2 credentials are configured (then: r2 + AWS_* below).
+      FILESYSTEM_DISK: ${FILESYSTEM_DISK:-public}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_ENDPOINT: ${AWS_ENDPOINT:-}
+      AWS_URL: ${AWS_URL:-}
+    depends_on:
+      db: { condition: service_healthy }
+    logging: *logging
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: undangan-nginx
+    restart: unless-stopped
+    volumes:
+      - ./backend/public:/app/public:ro
+      # public/storage is a symlink to /app/storage/app/public: uploads must exist at that path here too.
+      - ./backend/storage/app/public:/app/storage/app/public:ro
+      - ./docker/nginx/api.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "127.0.0.1:8070:80"
+    depends_on: [backend]
+    logging: *logging
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        NEXT_PUBLIC_APP_URL: https://undangan-digital.link
+        NEXT_PUBLIC_API_URL: https://undangan-digital.link
+    image: undangan-frontend:prod
+    container_name: undangan-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      # Server-side fetches go straight to the API container instead of out through Cloudflare.
+      API_INTERNAL_URL: http://nginx
+    ports:
+      - "127.0.0.1:3070:3000"
+    depends_on: [nginx]
+    logging: *logging
+
+volumes:
+  db_data:

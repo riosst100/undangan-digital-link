@@ -3,3 +3,6 @@ Thumbs.db
 *.log
 .idea/
 .vscode/
+
+# Production secrets for docker-compose.prod.yml
+.env

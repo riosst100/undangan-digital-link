@@ -19,6 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Behind Caddy -> nginx (only reachable from this machine): trust the forwarding hop so
+        // request()->ip() is the visitor (per-IP throttling) and https is detected for cookies/URLs.
+        $middleware->trustProxies(at: '*');
         $middleware->statefulApi();
 
         $middleware->throttleApi();
