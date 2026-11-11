@@ -48,6 +48,39 @@ class TahlilInvitationPdf
     /** Usable inside of the rounded recipient box (outline spans x 338–551, y 150–232). */
     private const RECIPIENT_BOX = ['cx' => 444.5, 'cy' => 191.2, 'w' => 190.0, 'h' => 70.0];
 
+    public const DEFAULT_CLOSING = 'Demikian undangan ini kami sampaikan, atas perhatian dan keikhlasan langkah {sapaan} untuk menghadiri undangan ini, kami ucapkan terima kasih.';
+
+    public const DEFAULT_SALAM = 'Wassalamu’alaikum Wr.Wb';
+
+    public const DEFAULT_SIGNOFF = 'Hormat Kami,';
+
+    public const DEFAULT_RECIPIENT = 'Kepada Yth,';
+
+    public const DEFAULT_SCHEDULE_INTRO = 'Yang akan dilaksanakan pada :';
+
+    public const DEFAULT_NO_GIFTS = 'TIDAK MENERIMA KONDANGAN';
+
+    /** Wording shown in the form by default; {sapaan} is replaced by the guest salutation. */
+    public static function defaultOpening(string $type): string
+    {
+        $purpose = $type === 'tahlil' ? 'memberikan do’a barokah pada acara' : 'hadir pada acara';
+
+        return 'Dengan memohon Rahmat dan Ridho Allah SWT, kami memohon dengan hormat kehadiran {sapaan} untuk '.$purpose;
+    }
+
+    public static function defaultSubjectLabel(string $type): string
+    {
+        return ['tahlil' => 'wafatnya:', 'pernikahan' => 'pernikahan:', 'khitan' => ':'][$type] ?? '';
+    }
+
+    /** Trimmed input value, or the default when blank. */
+    private function text_or(array $input, string $key, string $default): string
+    {
+        $value = trim((string) ($input[$key] ?? ''));
+
+        return $value === '' ? $default : $value;
+    }
+
     private Mpdf $mpdf;
 
     /**
@@ -62,7 +95,7 @@ class TahlilInvitationPdf
         ));
 
         $this->mpdf = $this->makeMpdf();
-        $this->mpdf->SetTitle('Undangan '.$data['eventName'].' '.$data['deceasedTitle'].' '.$data['deceasedName']);
+        $this->mpdf->SetTitle(trim('Undangan '.$data['eventName'].' '.$data['subject']));
         $this->mpdf->SetCreator(config('app.name'));
 
         $this->mpdf->setSourceFile(resource_path('pdf/tahlil-template.pdf'));
@@ -84,18 +117,43 @@ class TahlilInvitationPdf
      */
     public function viewData(array $input): array
     {
-        $female = $input['deceased_gender'] === 'P';
+        $type = $input['type'] ?? 'tahlil';
+        $female = ($input['deceased_gender'] ?? null) === 'P';
         $date = Carbon::createFromFormat('Y-m-d', $input['date'])->locale('id');
         $parentName = trim((string) ($input['parent_name'] ?? ''));
         $timeNote = trim((string) ($input['time_note'] ?? ''));
 
         return [
+            'type' => $type,
+            'illustration' => trim((string) ($input['illustration'] ?? '')) ?: null,
+            'subject' => match ($type) {
+                'pernikahan' => trim(trim((string) ($input['groom_name'] ?? '')).' & '.trim((string) ($input['bride_name'] ?? ''))),
+                'khitan' => trim((string) ($input['child_name'] ?? '')),
+                default => trim(($female ? 'Almh.' : 'Alm.').' '.trim((string) ($input['deceased_name'] ?? ''))),
+            },
+            'subjectLineage' => match ($type) {
+                'khitan' => $parentName === '' ? null : 'Putra '.$parentName,
+                'tahlil' => $parentName === '' ? null : ($female ? 'Binti ' : 'Bin ').$parentName,
+                default => null,
+            },
+            'openingText' => $this->text_or($input, 'opening_text', self::defaultOpening($type)),
+            'subjectLabel' => $this->text_or($input, 'subject_label', self::defaultSubjectLabel($type)),
+            'closingText' => $this->text_or($input, 'closing_text', self::DEFAULT_CLOSING),
+            'salamText' => $this->text_or($input, 'salam_text', self::DEFAULT_SALAM),
+            'recipientLabel' => $this->text_or($input, 'recipient_label', self::DEFAULT_RECIPIENT),
+            'scheduleIntro' => $this->text_or($input, 'schedule_intro', self::DEFAULT_SCHEDULE_INTRO),
+            'noGiftsText' => $this->text_or($input, 'no_gifts_text', self::DEFAULT_NO_GIFTS),
+            'signoffText' => $this->text_or($input, 'signoff_text', self::DEFAULT_SIGNOFF),
+            'title' => trim((string) ($input['title'] ?? '')) ?: 'UNDANGAN',
             'eventName' => trim($input['event_name']),
             'deceasedTitle' => $female ? 'Almh.' : 'Alm.',
-            'deceasedName' => trim($input['deceased_name']),
+            'deceasedName' => trim((string) ($input['deceased_name'] ?? '')),
             'lineage' => $parentName === '' ? null : ($female ? 'Binti ' : 'Bin ').$parentName,
             'salutation' => trim($input['guest_salutation']),
-            'day' => $date->translatedFormat('l'),
+            // From 18:00 the Javanese day has already turned: "Selasa malam Rabu".
+            'day' => $input['time'] >= '18:00'
+                ? $date->translatedFormat('l').' malam '.$date->copy()->addDay()->translatedFormat('l')
+                : $date->translatedFormat('l'),
             'date' => $date->translatedFormat('j F Y'),
             'time' => str_replace(':', '.', $input['time']).' '.$input['timezone'].($timeNote === '' ? '' : ' ('.$timeNote.')'),
             'venueLines' => array_values(array_filter(
@@ -114,15 +172,27 @@ class TahlilInvitationPdf
     {
         $ink = self::COVER_INK;
 
-        $this->text('UNDANGAN', 53.0, 67.07, 'librebaskerville', 'B', 25.43, $ink);
+        $title = mb_strtoupper($data['title']);
+        $this->text($title, 53.0, 67.07, 'librebaskerville', 'B', $this->fit($title, 'librebaskerville', 'B', 25.43, 270, 14), $ink);
         $this->text($data['eventName'], 57.0, 94.24, 'librebaskerville', 'B', $this->fit($data['eventName'], 'librebaskerville', 'B', 18.37, 260, 11), $ink);
 
         // Name and lineage, each wrapped to the space left of the recipient box;
         // at most 3 lines, bottom-aligned to the original second line.
-        $parts = array_values(array_filter([$data['deceasedTitle'].' '.$data['deceasedName'], $data['lineage']]));
+        // Khitan covers show the inviter (host) here instead of the child's name.
+        $parts = $data['type'] === 'khitan'
+            ? array_values(array_filter([$data['host']]))
+            : array_values(array_filter([$data['subject'], $data['subjectLineage']]));
+        $lines = [];
+        $size = 18.0;
         for ($size = 18.0; $size > 11; $size -= 0.5) {
+            if ($data['type'] === 'khitan') {
+                // The inviter stays on one line: the font shrinks to fit instead of wrapping.
+                $size = $this->fit($data['host'], 'freeserif', 'B', 18.0, 270, 6);
+                $lines = [[[$data['host'], 'B']]];
+                break;
+            }
             $lines = array_merge(...array_map(fn ($part) => $this->wrap([[$part, 'B']], 270, 'freeserif', $size), $parts));
-            if (count($lines) <= 3) {
+            if (count($lines) <= ($data['illustration'] ? 2 : 3)) {
                 break;
             }
         }
@@ -132,19 +202,41 @@ class TahlilInvitationPdf
             $this->text($runs[0][0], 57.0, $last - (count($lines) - 1 - $i) * $leading, 'freeserif', 'B', $size, $ink);
         }
 
+        if ($data['illustration']) {
+            $this->drawIllustration($data['illustration']);
+        }
+
         if ($data['noGifts']) {
-            $this->centered('TIDAK MENERIMA KONDANGAN', 437.7, 55.99, 'librebaskerville', 'B', 10.29, self::LETTER_INK);
+            $noGifts = mb_strtoupper($data['noGiftsText']);
+            $this->centered($noGifts, 437.7, 55.99, 'librebaskerville', 'B', $this->fit($noGifts, 'librebaskerville', 'B', 10.29, 200, 6), self::LETTER_INK);
         } else {
             $this->whiteOut(self::BADGE_RECT);
         }
 
-        $this->text('Kepada Yth,', 340.9, 125.54, 'freeserif', '', 11, $ink);
+        $this->text($data['recipientLabel'], 340.9, 125.54, 'freeserif', '', $this->fit($data['recipientLabel'], 'freeserif', '', 11, 200, 8), $ink);
         $salutationLine = $data['salutation'].' :';
         $this->text($salutationLine, 340.9, 140.55, 'freeserif', '', $this->fit($salutationLine, 'freeserif', '', 11, 240, 8), $ink);
 
         if ($guest !== null) {
             $this->drawGuestName($guest);
         }
+    }
+
+    /** Optional illustration, below the title on the left of the cover (fits the box, keeps aspect ratio). */
+    private function drawIllustration(string $dataUrl): void
+    {
+        [$boxX, $boxY, $boxW, $boxH] = [57.0, 104.0, 270.0, 68.0];
+
+        $bytes = base64_decode(substr($dataUrl, (int) strpos($dataUrl, ',') + 1), true);
+        $size = $bytes === false ? false : @getimagesizefromstring($bytes);
+        if ($size === false || $size[0] < 1 || $size[1] < 1) {
+            return;
+        }
+
+        $scale = min($boxW / $size[0], $boxH / $size[1]);
+        $w = $size[0] * $scale;
+        $h = $size[1] * $scale;
+        $this->mpdf->Image($dataUrl, $this->mm($boxX), $this->mm($boxY + ($boxH - $h) / 2), $this->mm($w), $this->mm($h), '', '', true, false);
     }
 
     private function drawGuestName(string $guest): void
@@ -176,9 +268,10 @@ class TahlilInvitationPdf
 
         // Opening paragraph, re-wrapped like the original (3 lines with the sample data).
         $opening = [
-            ['Dengan memohon Rahmat dan Ridho Allah SWT, kami memohon dengan hormat kehadiran '.$data['salutation'].' untuk memberikan do’a barokah pada acara', ''],
-            [$data['eventName'], 'B'],
-            ['wafatnya:', ''],
+            [str_replace('{sapaan}', $data['salutation'], $data['openingText']), ''],
+            // A bare ":" label is glued to the event name instead of floating after a space.
+            [$data['subjectLabel'] === ':' ? $data['eventName'].':' : $data['eventName'], 'B'],
+            ...($data['subjectLabel'] === ':' ? [] : [[$data['subjectLabel'], '']]),
         ];
         for ($size = self::BODY_SIZE; $size > 10; $size -= 0.25) {
             $lines = $this->wrap($opening, self::LETTER_MAX_W, $font, $size);
@@ -191,7 +284,8 @@ class TahlilInvitationPdf
         }
 
         // Deceased name in capitals: one line at 16.25pt, otherwise two lines.
-        $deceased = mb_strtoupper(trim($data['deceasedTitle'].' '.$data['deceasedName'].' '.($data['lineage'] ?? '')));
+        {
+        $deceased = mb_strtoupper(trim($data['subject'].' '.($data['subjectLineage'] ?? '')));
         if ($this->width($deceased, $font, 'B', 16.25) <= self::LETTER_MAX_W) {
             $this->centered($deceased, self::LETTER_CENTER, 488.65, $font, 'B', 16.25, $ink);
         } else {
@@ -206,7 +300,9 @@ class TahlilInvitationPdf
             }
         }
 
-        $this->centered('Yang akan dilaksanakan pada :', self::LETTER_CENTER, 534.44, $font, '', self::BODY_SIZE, $ink);
+        }
+
+        $this->centered($data['scheduleIntro'], self::LETTER_CENTER, 534.44, $font, '', $this->fit($data['scheduleIntro'], $font, '', self::BODY_SIZE, self::LETTER_MAX_W, 9), $ink);
 
         // Schedule rows line up with the colons baked into the template.
         $rows = [['Hari', $data['day'], 559.92], ['Tanggal', $data['date'], 580.18], ['Pukul', $data['time'], 600.44]];
@@ -240,13 +336,19 @@ class TahlilInvitationPdf
             $this->text($runs[0][0], 273.0, 620.69 + $i * $leading, $font, '', $size, $ink);
         }
 
-        $this->centered('Demikian undangan ini kami sampaikan, atas perhatian dan', self::LETTER_CENTER, 676.33, $font, '', self::BODY_SIZE, $ink);
-        $closing = 'keikhlasan langkah '.$data['salutation'].' untuk menghadiri undangan ini,';
-        $this->centered($closing, self::LETTER_CENTER, 695.09, $font, '', $this->fit($closing, $font, '', self::BODY_SIZE, self::LETTER_MAX_W, 9), $ink);
-        $this->centered('kami ucapkan terima kasih.', self::LETTER_CENTER, 713.84, $font, '', self::BODY_SIZE, $ink);
+        $closing = str_replace('{sapaan}', $data['salutation'], $data['closingText']);
+        for ($size = self::BODY_SIZE; $size > 9; $size -= 0.25) {
+            $closingLines = $this->wrap([[$closing, '']], self::LETTER_MAX_W, $font, $size);
+            if (count($closingLines) <= 3) {
+                break;
+            }
+        }
+        foreach ($closingLines as $i => $runs) {
+            $this->centeredRuns($runs, self::LETTER_CENTER, 676.33 + $i * self::BODY_LEADING, $font, $size, $ink);
+        }
 
-        $this->centered('Wassalamu’alaikum Wr.Wb', self::LETTER_CENTER, 744.69, $font, 'B', self::BODY_SIZE, $ink);
-        $this->centered('Hormat Kami,', self::LETTER_CENTER, 783.98, $font, 'B', self::BODY_SIZE, $ink);
+        $this->centered($data['salamText'], self::LETTER_CENTER, 744.69, $font, 'B', self::BODY_SIZE, $ink);
+        $this->centered($data['signoffText'], self::LETTER_CENTER, 783.98, $font, 'B', self::BODY_SIZE, $ink);
 
         $this->whiteOut(self::UNDERLINE_RECT);
         $hostSize = $this->fit($data['host'], $font, 'B', self::BODY_SIZE, 440, 9);

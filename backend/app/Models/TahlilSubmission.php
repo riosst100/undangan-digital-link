@@ -13,10 +13,12 @@ class TahlilSubmission extends Model
 {
     use HasUuid;
 
+    public const TYPES = ['tahlil', 'pernikahan', 'khitan'];
+
     public const STATUSES = ['baru', 'diproses', 'selesai'];
 
     protected $fillable = [
-        'contact_phone', 'event_name', 'deceased_gender', 'deceased_name', 'parent_name',
+        'contact_phone', 'illustration', 'opening_text', 'subject_label', 'closing_text', 'salam_text', 'signoff_text', 'recipient_label', 'schedule_intro', 'no_gifts_text', 'type', 'khitan_kind', 'groom_name', 'bride_name', 'child_name', 'title', 'event_name', 'deceased_gender', 'deceased_name', 'parent_name',
         'guest_salutation', 'date', 'time', 'timezone', 'time_note', 'venue', 'host',
         'no_gifts', 'guests', 'status',
     ];
@@ -50,7 +52,8 @@ class TahlilSubmission extends Model
     {
         return [
             ...$this->only([
-                'event_name', 'deceased_gender', 'deceased_name', 'parent_name', 'guest_salutation',
+                'illustration', 'opening_text', 'subject_label', 'closing_text', 'salam_text', 'signoff_text', 'recipient_label', 'schedule_intro', 'no_gifts_text',
+                'type', 'khitan_kind', 'groom_name', 'bride_name', 'child_name', 'title', 'event_name', 'deceased_gender', 'deceased_name', 'parent_name', 'guest_salutation',
                 'time', 'timezone', 'time_note', 'venue', 'host', 'no_gifts',
             ]),
             'date' => $this->date->format('Y-m-d'),

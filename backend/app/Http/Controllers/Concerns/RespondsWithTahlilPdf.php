@@ -13,7 +13,7 @@ trait RespondsWithTahlilPdf
      */
     protected function tahlilPdfResponse(array $validated, TahlilInvitationPdf $pdf): Response
     {
-        $filename = 'undangan-'.Str::slug($validated['event_name'].' '.$validated['deceased_name']).'.pdf';
+        $filename = 'undangan-'.Str::slug($validated['event_name'].' '.($validated['deceased_name'] ?? $validated['child_name'] ?? $validated['groom_name'] ?? '')).'.pdf';
 
         return response($pdf->render($validated), 200, [
             'Content-Type' => 'application/pdf',

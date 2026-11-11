@@ -1,17 +1,17 @@
 import Link from "next/link";
 import { serverFetch } from "@/lib/api/server-fetch";
 import { STATUS_LABEL, StatusBadge } from "@/components/tahlil/StatusBadge";
-import { waNumber } from "@/components/tahlil/form-state";
+import { subjectLabel, waNumber } from "@/components/tahlil/form-state";
 import type { TahlilStatus, TahlilSubmission } from "@/types/tahlil";
 
-export const metadata = { title: "Undangan Tahlil — Admin" };
+export const metadata = { title: "Undangan HVS — Admin" };
 
 const FILTERS: (TahlilStatus | null)[] = [null, "baru", "diproses", "selesai"];
 
 const receivedAt = new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Jakarta" });
 const eventDate = new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeZone: "UTC" });
 
-export default async function AdminTahlilSubmissionsPage({ searchParams }: PageProps<"/admin/undangan-tahlil">) {
+export default async function AdminTahlilSubmissionsPage({ searchParams }: PageProps<"/admin/undangan-kertas">) {
   const params = await searchParams;
   const status = FILTERS.find((value) => value !== null && value === params.status) ?? null;
   const submissions =
@@ -21,13 +21,13 @@ export default async function AdminTahlilSubmissionsPage({ searchParams }: PageP
     <div>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-medium text-zinc-900">Undangan Tahlil</h1>
+          <h1 className="text-2xl font-medium text-zinc-900">Undangan HVS</h1>
           <p className="mt-1 text-sm text-zinc-600">
             Data yang dikirim pengunjung lewat form publik. Buka untuk meninjau, mengubah, dan mengunduh PDF.
           </p>
         </div>
         <Link
-          href="/admin/undangan-tahlil/baru"
+          href="/admin/undangan-kertas/baru"
           className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
         >
           Buat baru
@@ -40,7 +40,7 @@ export default async function AdminTahlilSubmissionsPage({ searchParams }: PageP
           return (
             <Link
               key={value ?? "semua"}
-              href={value ? `/admin/undangan-tahlil?status=${value}` : "/admin/undangan-tahlil"}
+              href={value ? `/admin/undangan-kertas?status=${value}` : "/admin/undangan-kertas"}
               className={`rounded-full px-3 py-1.5 text-sm ${
                 active ? "bg-zinc-900 text-white" : "border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100"
               }`}
@@ -61,7 +61,7 @@ export default async function AdminTahlilSubmissionsPage({ searchParams }: PageP
             <thead className="border-b border-zinc-200 text-xs uppercase tracking-wide text-zinc-500">
               <tr>
                 <th className="px-4 py-3">Masuk</th>
-                <th className="px-4 py-3">Almarhum/ah</th>
+                <th className="px-4 py-3">Nama</th>
                 <th className="px-4 py-3">Acara</th>
                 <th className="px-4 py-3">Pengundang</th>
                 <th className="px-4 py-3">WhatsApp</th>
@@ -74,7 +74,7 @@ export default async function AdminTahlilSubmissionsPage({ searchParams }: PageP
                 <tr key={submission.id} className="border-b border-zinc-100 last:border-0">
                   <td className="whitespace-nowrap px-4 py-3 text-zinc-600">{receivedAt.format(new Date(submission.created_at))}</td>
                   <td className="px-4 py-3 font-medium text-zinc-900">
-                    {submission.deceased_gender === "P" ? "Almh." : "Alm."} {submission.deceased_name}
+                    {subjectLabel(submission)}
                   </td>
                   <td className="px-4 py-3 text-zinc-700">
                     {submission.event_name}
@@ -82,6 +82,7 @@ export default async function AdminTahlilSubmissionsPage({ searchParams }: PageP
                   </td>
                   <td className="px-4 py-3 text-zinc-700">{submission.host}</td>
                   <td className="whitespace-nowrap px-4 py-3">
+                    {submission.contact_phone ? (
                     <a
                       href={`https://wa.me/${waNumber(submission.contact_phone)}`}
                       target="_blank"
@@ -90,13 +91,16 @@ export default async function AdminTahlilSubmissionsPage({ searchParams }: PageP
                     >
                       {submission.contact_phone}
                     </a>
+                    ) : (
+                      <span className="text-zinc-400">—</span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={submission.status} />
                   </td>
                   <td className="px-4 py-3 text-right">
                     <Link
-                      href={`/admin/undangan-tahlil/${submission.id}`}
+                      href={`/admin/undangan-kertas/${submission.id}`}
                       className="rounded-full border border-zinc-200 px-3 py-1.5 text-sm text-zinc-900 hover:bg-zinc-50"
                     >
                       Buka

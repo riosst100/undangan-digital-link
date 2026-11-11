@@ -15,6 +15,8 @@ class TahlilSubmissionTest extends TestCase
     {
         return [
             'contact_phone' => '+62 812-3456-7890',
+            'type' => 'tahlil',
+            'title' => 'UNDANGAN',
             'event_name' => 'Tahlil 100 Hari',
             'deceased_gender' => 'P',
             'deceased_name' => 'Ibu Tarsem',
@@ -92,6 +94,24 @@ class TahlilSubmissionTest extends TestCase
         $this->getJson('/api/admin/tahlil-submissions')->assertStatus(401);
         $this->actingAs($customer)->getJson('/api/admin/tahlil-submissions')->assertStatus(403);
         $this->actingAs($customer)->getJson("/api/admin/tahlil-submissions/{$submission->id}/pdf")->assertStatus(403);
+    }
+
+    public function test_admin_can_store_a_draft_without_phone_and_update_it(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $payload = $this->payload();
+        unset($payload['contact_phone']);
+
+        $id = $this->actingAs($admin)->postJson('/api/admin/tahlil-submissions', $payload)
+            ->assertCreated()
+            ->assertJsonPath('data.status', 'diproses')
+            ->json('data.id');
+
+        $this->actingAs($admin)->patchJson("/api/admin/tahlil-submissions/{$id}", [...$payload, 'status' => 'selesai', 'host' => 'Bpk Baru'])
+            ->assertOk()
+            ->assertJsonPath('data.host', 'Bpk Baru');
+
+        $this->assertSame(1, TahlilSubmission::count());
     }
 
     public function test_admin_can_list_filter_and_view_submissions(): void

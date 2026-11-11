@@ -14,6 +14,8 @@ class TahlilInvitationPdfTest extends TestCase
     private function payload(array $overrides = []): array
     {
         return [
+            'type' => 'tahlil',
+            'title' => 'UNDANGAN',
             'event_name' => 'Tahlil 100 Hari',
             'deceased_gender' => 'P',
             'deceased_name' => 'Ibu Tarsem',

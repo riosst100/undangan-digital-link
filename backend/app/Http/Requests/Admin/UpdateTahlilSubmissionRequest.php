@@ -16,7 +16,7 @@ class UpdateTahlilSubmissionRequest extends GenerateTahlilInvitationRequest
     {
         return [
             ...parent::rules(),
-            'contact_phone' => $this->contactPhoneRules(),
+            'contact_phone' => ['nullable', 'string', 'regex:/^08[0-9]{7,12}$/'],
             'status' => ['required', Rule::in(TahlilSubmission::STATUSES)],
         ];
     }

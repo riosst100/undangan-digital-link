@@ -6,12 +6,14 @@ import { submitTahlilInvitation } from "@/lib/api/tahlil";
 import { initialForm, MAX_GUESTS, toSubmissionInput, validateForm, type TahlilFormState } from "./form-state";
 import { TahlilFields } from "./TahlilFields";
 import { THEMES } from "./themes";
+import { useFormDraft } from "./useFormDraft";
 
 const theme = THEMES.public;
 
 /** Public form: sends the data to admins, who review it and send back the PDF. */
 export function PublicTahlilForm() {
   const [form, setForm] = useState<TahlilFormState>(initialForm);
+  const clearDraft = useFormDraft("draft:undangan-form", form, setForm);
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -28,6 +30,7 @@ export function PublicTahlilForm() {
     setStatus("sending");
     try {
       await submitTahlilInvitation(toSubmissionInput(form));
+      clearDraft();
       setStatus("sent");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {

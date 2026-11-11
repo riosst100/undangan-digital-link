@@ -49,6 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('tahlil-invitations/pdf', [TahlilInvitationController::class, 'pdf']);
         Route::get('tahlil-submissions', [AdminTahlilSubmissionController::class, 'index']);
+        Route::post('tahlil-submissions', [AdminTahlilSubmissionController::class, 'store']);
         Route::get('tahlil-submissions/{submission}', [AdminTahlilSubmissionController::class, 'show'])->whereUuid('submission');
         Route::patch('tahlil-submissions/{submission}', [AdminTahlilSubmissionController::class, 'update'])->whereUuid('submission');
         Route::delete('tahlil-submissions/{submission}', [AdminTahlilSubmissionController::class, 'destroy'])->whereUuid('submission');

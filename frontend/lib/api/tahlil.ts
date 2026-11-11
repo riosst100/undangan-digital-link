@@ -18,6 +18,11 @@ export async function downloadTahlilSubmissionPdf(id: string) {
   return apiFetchBlob(`${ADMIN_BASE}/${encodeURIComponent(id)}/pdf`, { cache: "no-store" });
 }
 
+/** Admin: save a drafted invitation (first PDF generation). */
+export async function createTahlilSubmission(input: TahlilSubmissionInput & { status?: TahlilStatus }): Promise<TahlilSubmission> {
+  return apiFetch<TahlilSubmission>(ADMIN_BASE, { method: "POST", body: input });
+}
+
 export async function updateTahlilSubmission(
   id: string,
   input: TahlilSubmissionInput & { status: TahlilStatus },

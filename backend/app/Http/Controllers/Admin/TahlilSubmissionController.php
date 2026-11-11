@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Concerns\ApiResponses;
 use App\Http\Controllers\Concerns\RespondsWithTahlilPdf;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreTahlilSubmissionRequest;
 use App\Http\Requests\Admin\UpdateTahlilSubmissionRequest;
 use App\Http\Resources\Admin\TahlilSubmissionResource;
 use App\Models\TahlilSubmission;
@@ -33,6 +34,14 @@ class TahlilSubmissionController extends Controller
     public function show(TahlilSubmission $submission): JsonResponse
     {
         return $this->success(new TahlilSubmissionResource($submission));
+    }
+
+    /** Saves an admin-drafted invitation (created the first time its PDF is generated). */
+    public function store(StoreTahlilSubmissionRequest $request): JsonResponse
+    {
+        $submission = TahlilSubmission::create([...$request->validated(), 'status' => $request->validated('status') ?? 'diproses']);
+
+        return $this->success(new TahlilSubmissionResource($submission), 201);
     }
 
     public function update(UpdateTahlilSubmissionRequest $request, TahlilSubmission $submission): JsonResponse
