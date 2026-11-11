@@ -23,6 +23,24 @@ export async function createTahlilSubmission(input: TahlilSubmissionInput & { st
   return apiFetch<TahlilSubmission>(ADMIN_BASE, { method: "POST", body: input });
 }
 
+export type CsvImportResult = { created: number; updated: number; errors: { row: number; message: string }[] };
+
+/** Admin: download the list (optionally one status) or an empty template as CSV. */
+export async function exportTahlilCsv(options: { status?: TahlilStatus | null; template?: boolean } = {}) {
+  const query = new URLSearchParams();
+  if (options.status) query.set("status", options.status);
+  if (options.template) query.set("template", "1");
+  const qs = query.toString();
+  return apiFetchBlob(`${ADMIN_BASE}/export${qs ? `?${qs}` : ""}`, { cache: "no-store" });
+}
+
+/** Admin: create/update invitations from a CSV file. */
+export async function importTahlilCsv(file: File): Promise<CsvImportResult> {
+  const body = new FormData();
+  body.append("file", file);
+  return apiFetch<CsvImportResult>(`${ADMIN_BASE}/import`, { method: "POST", body });
+}
+
 export async function updateTahlilSubmission(
   id: string,
   input: TahlilSubmissionInput & { status: TahlilStatus },

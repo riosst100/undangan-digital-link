@@ -272,7 +272,7 @@ export function AdminTahlilEditor({ submission }: { submission?: TahlilSubmissio
                 </a>
               </div>
             </div>
-            <iframe src={pdf.url} title="Preview undangan" className="w-full flex-1 rounded-lg border border-zinc-200" />
+            <iframe src={`${pdf.url}#toolbar=0&navpanes=0`} title="Preview undangan" className="w-full flex-1 border border-zinc-200" />
           </>
         ) : (
           <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed border-zinc-200 p-8 text-center text-sm text-zinc-500">

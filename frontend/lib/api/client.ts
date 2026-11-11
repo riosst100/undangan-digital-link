@@ -67,7 +67,7 @@ async function parseApiResponse<T>(res: Response): Promise<T> {
 async function doFetch(path: string, method: string, options: RequestOptions, xsrfToken: string | null) {
   const headers: Record<string, string> = {
     Accept: "application/json",
-    ...(options.body ? { "Content-Type": "application/json" } : {}),
+    ...(options.body && !(options.body instanceof FormData) ? { "Content-Type": "application/json" } : {}),
     ...(xsrfToken ? { "X-XSRF-TOKEN": xsrfToken } : {}),
     ...options.headers,
   };
@@ -75,7 +75,7 @@ async function doFetch(path: string, method: string, options: RequestOptions, xs
   return fetch(`${API_BASE_URL}${path}`, {
     method,
     headers,
-    body: options.body ? JSON.stringify(options.body) : undefined,
+    body: options.body instanceof FormData ? options.body : options.body ? JSON.stringify(options.body) : undefined,
     cache: options.cache,
     next: options.next,
     credentials: "include",

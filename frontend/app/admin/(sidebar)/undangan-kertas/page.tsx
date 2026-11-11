@@ -2,6 +2,7 @@ import Link from "next/link";
 import { serverFetch } from "@/lib/api/server-fetch";
 import { STATUS_LABEL, StatusBadge } from "@/components/tahlil/StatusBadge";
 import { subjectLabel, waNumber } from "@/components/tahlil/form-state";
+import { CsvTools } from "@/components/tahlil/CsvTools";
 import type { TahlilStatus, TahlilSubmission } from "@/types/tahlil";
 
 export const metadata = { title: "Undangan HVS — Admin" };
@@ -33,6 +34,8 @@ export default async function AdminTahlilSubmissionsPage({ searchParams }: PageP
           Buat baru
         </Link>
       </div>
+
+      <CsvTools status={status} />
 
       <nav className="mt-6 flex flex-wrap gap-2" aria-label="Filter status">
         {FILTERS.map((value) => {

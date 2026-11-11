@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\TahlilInvitationController;
 use App\Http\Controllers\Admin\TahlilSubmissionController as AdminTahlilSubmissionController;
+use App\Http\Controllers\Admin\TahlilSubmissionCsvController;
 use App\Http\Controllers\Admin\TemplateController as AdminTemplateController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Customer\GuestController as CustomerGuestController;
@@ -48,6 +49,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('customers', [AdminCustomerController::class, 'index']);
 
         Route::post('tahlil-invitations/pdf', [TahlilInvitationController::class, 'pdf']);
+        Route::get('tahlil-submissions/export', [TahlilSubmissionCsvController::class, 'export']);
+        Route::post('tahlil-submissions/import', [TahlilSubmissionCsvController::class, 'import']);
         Route::get('tahlil-submissions', [AdminTahlilSubmissionController::class, 'index']);
         Route::post('tahlil-submissions', [AdminTahlilSubmissionController::class, 'store']);
         Route::get('tahlil-submissions/{submission}', [AdminTahlilSubmissionController::class, 'show'])->whereUuid('submission');

@@ -114,6 +114,34 @@ class TahlilSubmissionTest extends TestCase
         $this->assertSame(1, TahlilSubmission::count());
     }
 
+    public function test_admin_can_export_and_import_csv(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $existing = $this->submission(['deceased_name' => 'Ibu Tarsem', 'guests' => ['Bapak Ahmad', 'Ibu Siti']]);
+
+        $csv = $this->actingAs($admin)->get('/api/admin/tahlil-submissions/export')->assertOk()->streamedContent();
+        $this->assertStringContainsString('Ibu Tarsem', $csv);
+        $this->assertStringContainsString('Bapak Ahmad | Ibu Siti', $csv);
+
+        $body = "type;event_name;title;deceased_gender;deceased_name;guest_salutation;date;time;timezone;venue;host;no_gifts;guests;id\n"
+            ."tahlil;Tahlil 7 Hari;UNDANGAN;L;Bapak Darmo;Bapak/Saudara;09/11/2026;19:30;WIB;Rumah Darmo;Bpk Kono;tidak;Andi | Budi;\n"
+            ."tahlil;;UNDANGAN;L;;Bapak/Saudara;2026-11-09;19:30;WIB;Rumah;Bpk Kono;ya;;\n"
+            ."tahlil;Tahlil 100 Hari;UNDANGAN;P;Ibu Diperbarui;Bapak/Saudara;2026-11-08;16:00;WIB;Rumah;Bpk Kono;ya;;{$existing->id}\n";
+        $file = \Illuminate\Http\UploadedFile::fake()->createWithContent('data.csv', $body);
+
+        $this->actingAs($admin)->post('/api/admin/tahlil-submissions/import', ['file' => $file], ['Accept' => 'application/json'])
+            ->assertOk()
+            ->assertJsonPath('data.created', 1)
+            ->assertJsonPath('data.updated', 1)
+            ->assertJsonPath('data.errors.0.row', 3);
+
+        $this->assertSame('Ibu Diperbarui', $existing->fresh()->deceased_name);
+        $created = TahlilSubmission::where('deceased_name', 'Bapak Darmo')->firstOrFail();
+        $this->assertSame('2026-11-09', $created->date->format('Y-m-d'));
+        $this->assertSame(['Andi', 'Budi'], $created->guests);
+        $this->assertFalse($created->no_gifts);
+    }
+
     public function test_admin_can_list_filter_and_view_submissions(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
