@@ -45,8 +45,9 @@ type Props = {
 /** The invitation fields shared by the public form and the admin editor. */
 export function TahlilFields({ form, onChange: set, theme, maxGuests, audience, showContact = true }: Props) {
   const female = form.deceased_gender === "P";
-  const isTahlil = form.type === "tahlil";
-  const current = eventOptions(form.type, form.khitan_kind);
+  const type: InvitationType = form.type || "tahlil";
+  const isTahlil = type === "tahlil";
+  const current = eventOptions(type, form.khitan_kind);
 
   /** Switch type/kind; the event name follows only while it is still a default. */
   function changeKind(type: InvitationType, kind: KhitanKind) {
@@ -57,59 +58,60 @@ export function TahlilFields({ form, onChange: set, theme, maxGuests, audience, 
   }
   const guestCount = parseGuests(form.guests).length;
 
+  const typeSelect = (
+    <Field theme={theme} label="Jenis undangan" htmlFor="type">
+      <select
+        id="type"
+        required
+        value={form.type}
+        onChange={(e) => changeKind(e.target.value as InvitationType, form.khitan_kind)}
+        className={theme.input}
+      >
+        <option value="" disabled>
+          Pilih jenis undangan…
+        </option>
+        {INVITATION_TYPES.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </Field>
+  );
+
+  // The rest of the form appears once a type is chosen.
+  if (!form.type) {
+    return (
+      <section className={theme.card}>
+        <h2 className={theme.heading}>Jenis undangan</h2>
+        {typeSelect}
+        <p className={theme.hint}>Pilih jenis undangan untuk menampilkan formulirnya.</p>
+      </section>
+    );
+  }
+
   return (
     <>
       <section className={theme.card}>
-        <h2 className={theme.heading}>{isTahlil ? "Almarhum/ah" : form.type === "pernikahan" ? "Pernikahan" : "Khitan"}</h2>
+        <h2 className={theme.heading}>{isTahlil ? "Almarhum/ah" : type === "pernikahan" ? "Pernikahan" : "Khitan"}</h2>
 
-        <fieldset>
-          <legend className={theme.label}>Jenis undangan</legend>
-          <div className="mt-1.5 flex flex-wrap gap-2">
-            {INVITATION_TYPES.map((option) => (
-              <label
-                key={option.value}
-                className={`flex-1 cursor-pointer rounded-lg border px-3 py-2 text-center text-sm transition-colors ${
-                  form.type === option.value ? theme.choiceOn : theme.choiceOff
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="type"
-                  value={option.value}
-                  checked={form.type === option.value}
-                  onChange={() => changeKind(option.value, form.khitan_kind)}
-                  className="sr-only"
-                />
-                {option.label}
-              </label>
-            ))}
-          </div>
-        </fieldset>
+        {typeSelect}
 
         {form.type === "khitan" ? (
-          <fieldset>
-            <legend className={theme.label}>Jenis khitan</legend>
-            <div className="mt-1.5 flex flex-wrap gap-2">
+          <Field theme={theme} label="Jenis khitan" htmlFor="khitan_kind">
+            <select
+              id="khitan_kind"
+              value={form.khitan_kind}
+              onChange={(e) => changeKind("khitan", e.target.value as KhitanKind)}
+              className={theme.input}
+            >
               {KHITAN_KINDS.map((option) => (
-                <label
-                  key={option.value}
-                  className={`flex-1 cursor-pointer rounded-lg border px-3 py-2 text-center text-sm transition-colors ${
-                    form.khitan_kind === option.value ? theme.choiceOn : theme.choiceOff
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="khitan_kind"
-                    value={option.value}
-                    checked={form.khitan_kind === option.value}
-                    onChange={() => changeKind("khitan", option.value)}
-                    className="sr-only"
-                  />
+                <option key={option.value} value={option.value}>
                   {option.label}
-                </label>
+                </option>
               ))}
-            </div>
-          </fieldset>
+            </select>
+          </Field>
         ) : null}
 
         <Field theme={theme} label="Judul undangan" htmlFor="title">
@@ -350,7 +352,7 @@ export function TahlilFields({ form, onChange: set, theme, maxGuests, audience, 
           <button
             type="button"
             onClick={() => {
-              for (const [field, value] of Object.entries(wordingDefaults(form.type))) set(field as keyof TahlilFormState, value as never);
+              for (const [field, value] of Object.entries(wordingDefaults(type))) set(field as keyof TahlilFormState, value as never);
             }}
             className="text-xs text-zinc-500 underline-offset-2 hover:underline"
           >

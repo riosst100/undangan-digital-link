@@ -227,7 +227,7 @@ export function AdminTahlilEditor({ submission }: { submission?: TahlilSubmissio
         ) : null}
 
         <div className="sticky bottom-0 -mx-1 flex flex-wrap items-center gap-2 bg-zinc-50/95 px-1 py-3 backdrop-blur-sm">
-          <button type="submit" disabled={busy !== null} className={theme.primary}>
+          <button type="submit" disabled={busy !== null || !form.type} className={theme.primary}>
             {busy === "save" || busy === "preview" ? "Menyimpan & membuat PDF…" : hasId ? "Simpan & perbarui PDF" : "Buat PDF"}
           </button>
           <span className="text-xs text-zinc-500">

@@ -71,7 +71,7 @@ export function PublicTahlilForm() {
         </p>
       ) : null}
 
-      <button type="submit" disabled={status === "sending"} className={`w-full ${theme.primary}`}>
+      <button type="submit" hidden={!form.type} disabled={status === "sending"} className={`w-full ${theme.primary}`}>
         {status === "sending" ? "Mengirim…" : "Kirim data undangan"}
       </button>
     </form>

@@ -82,7 +82,7 @@ export function wordingForType(form: TahlilFormState, type: InvitationType): Par
 
 /** Short description of who the invitation is about, for lists and messages. */
 export function subjectLabel(input: {
-  type: InvitationType;
+  type: InvitationType | "";
   deceased_gender: "L" | "P" | null;
   deceased_name: string | null;
   groom_name: string | null;
@@ -98,11 +98,12 @@ export function subjectLabel(input: {
 export const MAX_GUESTS = { public: 50, admin: 200 } as const;
 
 /** Form-friendly shape: guests edited as one name per line. */
-export type TahlilFormState = Omit<TahlilSubmissionInput, "guests"> & { guests: string };
+/** `type` is empty until the user picks one; the rest of the form only shows after that. */
+export type TahlilFormState = Omit<TahlilSubmissionInput, "guests" | "type"> & { guests: string; type: InvitationType | "" };
 
 export const EMPTY_FORM: TahlilFormState = {
   contact_phone: "",
-  type: "tahlil",
+  type: "",
   illustration: "",
   ...wordingDefaults("tahlil"),
   khitan_kind: "sinoman",
@@ -110,7 +111,7 @@ export const EMPTY_FORM: TahlilFormState = {
   bride_name: "",
   child_name: "",
   title: "UNDANGAN",
-  event_name: "Tahlil 100 Hari",
+  event_name: "",
   deceased_gender: "P",
   deceased_name: "",
   parent_name: "",
@@ -134,6 +135,8 @@ export function initialForm(): TahlilFormState {
 
   return {
     ...EMPTY_FORM,
+    type: "tahlil",
+    event_name: "Tahlil 100 Hari",
     contact_phone: "0812 3456 7890",
     deceased_name: "Ibu Tarsem",
     parent_name: "Surma (Gandamisastra)",
@@ -185,7 +188,7 @@ export function parseGuests(raw: string): string[] {
 }
 
 export function toSubmissionInput(form: TahlilFormState): TahlilSubmissionInput {
-  return { ...form, guests: parseGuests(form.guests) };
+  return { ...form, type: form.type as InvitationType, guests: parseGuests(form.guests) };
 }
 
 export function toInvitationInput(form: TahlilFormState): TahlilInvitationInput {
@@ -196,6 +199,7 @@ export function toInvitationInput(form: TahlilFormState): TahlilInvitationInput 
 
 /** Client-side checks mirroring server rules the browser can't enforce itself. */
 export function validateForm(form: TahlilFormState, maxGuests: number): string | null {
+  if (!form.type) return "Pilih jenis undangan.";
   const venueLines = form.venue.split("\n").filter((line) => line.trim() !== "").length;
   if (venueLines > MAX_VENUE_LINES) return `Tempat maksimal ${MAX_VENUE_LINES} baris.`;
   if (parseGuests(form.guests).length > maxGuests) return `Maksimal ${maxGuests} nama tamu.`;
@@ -211,7 +215,7 @@ export function isComplete(form: TahlilFormState): boolean {
       : form.type === "khitan"
         ? filled(form.child_name)
         : filled(form.deceased_name);
-  return subject && [form.title, form.event_name, form.guest_salutation, form.date, form.time, form.venue, form.host].every(filled);
+  return form.type !== "" && subject && [form.title, form.event_name, form.guest_salutation, form.date, form.time, form.venue, form.host].every(filled);
 }
 
 /** "081234567890" → "6281234567890" for wa.me links. */
