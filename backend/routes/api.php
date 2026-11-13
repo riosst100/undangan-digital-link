@@ -44,6 +44,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('can:admin')->prefix('admin')->group(function () {
         Route::get('templates', [AdminTemplateController::class, 'index']);
         Route::post('templates', [AdminTemplateController::class, 'store']);
+        Route::get('templates/{template}', [AdminTemplateController::class, 'show']);
+        Route::patch('templates/{template}', [AdminTemplateController::class, 'update']);
+        Route::put('templates/{template}/design', [AdminTemplateController::class, 'saveDesign']);
+        Route::post('templates/{template}/images', [AdminTemplateController::class, 'addImages']);
+        Route::delete('templates/{template}/images', [AdminTemplateController::class, 'removeImage']);
         Route::delete('templates/{template}', [AdminTemplateController::class, 'destroy']);
 
         Route::get('customers', [AdminCustomerController::class, 'index']);

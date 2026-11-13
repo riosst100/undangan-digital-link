@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createTemplate } from "@/lib/api/admin-templates";
+import { createTemplate, uploadTemplateImages } from "@/lib/api/admin-templates";
 import { ApiError } from "@/lib/api/client";
 import { ANIMATION_PRESETS, FONTS, SECTION_TYPES, SECTION_VARIANTS, type SectionType } from "@/types/template";
 import type { AdminTemplate } from "@/types/admin-template";
@@ -48,6 +48,7 @@ export function CreateTemplateForm({ onCreated }: { onCreated: (template: AdminT
   const [headingFont, setHeadingFont] = useState<string>(FONTS[0]);
   const [bodyFont, setBodyFont] = useState<string>(FONTS[2]);
   const [animationPreset, setAnimationPreset] = useState<string>(ANIMATION_PRESETS[1]);
+  const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -78,6 +79,7 @@ export function CreateTemplateForm({ onCreated }: { onCreated: (template: AdminT
     setHeadingFont(FONTS[0]);
     setBodyFont(FONTS[2]);
     setAnimationPreset(ANIMATION_PRESETS[1]);
+    setFiles([]);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -111,7 +113,15 @@ export function CreateTemplateForm({ onCreated }: { onCreated: (template: AdminT
         },
       });
 
-      onCreated(created);
+      let result = created;
+      if (files.length > 0) {
+        try {
+          result = await uploadTemplateImages(created.id, files);
+        } catch {
+          // Template exists; images can be re-added via Edit.
+        }
+      }
+      onCreated(result);
       setOpen(false);
       resetForm();
     } catch (err) {
@@ -207,10 +217,22 @@ export function CreateTemplateForm({ onCreated }: { onCreated: (template: AdminT
         />
       </label>
 
+      <label className="block text-sm">
+        <span className="mb-1 block text-zinc-600">Gambar (bisa lebih dari satu)</span>
+        <input
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          multiple
+          onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
+          className="w-full text-sm"
+        />
+        {files.length > 0 ? <span className="text-xs text-zinc-500">{files.length} gambar dipilih</span> : null}
+      </label>
+
       <div>
         <span className="mb-2 block text-sm text-zinc-600">Bagian undangan</span>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {SECTION_TYPES.map((type) => (
+          {SECTION_TYPES.filter((type) => type !== "spacer" && type !== "container").map((type) => (
             <div key={type} className="flex items-center gap-2 rounded-lg border border-zinc-200 px-3 py-2">
               <input
                 type="checkbox"

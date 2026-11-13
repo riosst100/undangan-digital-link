@@ -23,13 +23,13 @@ export function CoverMinimal({ content }: { content: CoverContent }) {
         transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 }}
         className="flex flex-col items-center gap-2"
       >
-        <p className="text-sm uppercase tracking-[0.35em] text-[var(--color-primary)]">The Wedding Of</p>
+        <p className="text-[15px] sm:text-sm uppercase tracking-[0.35em] text-[var(--color-primary)]">The Wedding Of</p>
         <h1
-          className="text-5xl font-medium leading-tight"
+          className="flex flex-col items-center text-[clamp(2.5rem,12vw,4rem)] font-medium leading-[1.1] [overflow-wrap:anywhere] sm:flex-row sm:flex-wrap sm:justify-center"
           style={{ fontFamily: "var(--font-heading)" }}
         >
           {content.groomNickname}
-          <span className="mx-3 text-[var(--color-primary)]">&amp;</span>
+          <span className="my-1 text-[0.7em] text-[var(--color-primary)] sm:mx-3 sm:my-0 sm:text-[1em]">&amp;</span>
           {content.brideNickname}
         </h1>
       </motion.div>
@@ -38,7 +38,7 @@ export function CoverMinimal({ content }: { content: CoverContent }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.4 }}
-        className="text-sm text-[var(--color-muted)]"
+        className="text-[15px] sm:text-sm text-[var(--color-muted)]"
       >
         {content.eventDate}
       </motion.p>

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { SectionHeading } from "@/components/sections/SectionHeading";
 import type { CoupleContent } from "./CoupleClassic";
 
 function Half({
@@ -26,16 +27,17 @@ function Half({
       <h3 className="text-2xl" style={{ fontFamily: "var(--font-heading)" }}>
         {person.nickname || person.name}
       </h3>
-      <p className="text-sm text-[var(--color-muted)]">{person.name}</p>
-      {person.parents ? <p className="mt-1 text-sm text-[var(--color-muted)]">{person.parents}</p> : null}
-      {person.bio ? <p className="mt-2 max-w-xs text-sm">{person.bio}</p> : null}
+      <p className="text-[15px] sm:text-sm text-[var(--color-muted)]">{person.name}</p>
+      {person.parents ? <p className="mt-1 text-[15px] sm:text-sm text-[var(--color-muted)]">{person.parents}</p> : null}
+      {person.bio ? <p className="mt-2 max-w-xs text-[15px] sm:text-sm">{person.bio}</p> : null}
     </motion.div>
   );
 }
 
 export function CoupleSplit({ content }: { content: CoupleContent }) {
   return (
-    <section className="py-4">
+    <section className="py-16">
+      <SectionHeading eyebrow="Bismillah" title="Mempelai" />
       <div className="mx-auto flex max-w-3xl flex-col sm:flex-row sm:items-center">
         <Half person={content.groom} label="Mempelai Pria" align="left" />
         <div

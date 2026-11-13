@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { SectionHeading } from "@/components/sections/SectionHeading";
 
 export type CoupleContent = {
   bride: { name: string; nickname?: string; parents?: string; bio?: string; photoUrl?: string };
@@ -18,7 +19,7 @@ function Person({ person, label }: { person: CoupleContent["bride"]; label: stri
     >
       {person.photoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <img loading="lazy" decoding="async"
           src={person.photoUrl}
           alt={person.name}
           className="h-32 w-32 rounded-full object-cover shadow-[var(--shadow-card)]"
@@ -36,8 +37,8 @@ function Person({ person, label }: { person: CoupleContent["bride"]; label: stri
         <h3 className="mt-1 text-xl" style={{ fontFamily: "var(--font-heading)" }}>
           {person.nickname || person.name}
         </h3>
-        {person.parents ? <p className="mt-1 text-sm text-[var(--color-muted)]">{person.parents}</p> : null}
-        {person.bio ? <p className="mt-2 max-w-xs text-sm">{person.bio}</p> : null}
+        {person.parents ? <p className="mt-1 text-[15px] sm:text-sm text-[var(--color-muted)]">{person.parents}</p> : null}
+        {person.bio ? <p className="mt-2 max-w-xs text-[15px] sm:text-sm">{person.bio}</p> : null}
       </div>
     </motion.div>
   );
@@ -46,6 +47,7 @@ function Person({ person, label }: { person: CoupleContent["bride"]; label: stri
 export function CoupleClassic({ content }: { content: CoupleContent }) {
   return (
     <section className="px-6 py-16">
+      <SectionHeading eyebrow="Bismillah" title="Mempelai" />
       <div className="mx-auto flex max-w-2xl flex-col items-center gap-10 sm:flex-row sm:items-start sm:justify-center sm:gap-6">
         <Person person={content.bride} label="Mempelai Wanita" />
         <div

@@ -18,7 +18,7 @@ export function GuestGreetingDefault({ content }: { content: GuestGreetingConten
         transition={{ duration: 0.6 }}
         className="mx-auto max-w-sm rounded-[var(--radius-card)] bg-[var(--color-secondary)]/40 px-5 py-4 text-center"
       >
-        <p className="text-sm text-[var(--color-muted)]">Undangan ini ditujukan kepada</p>
+        <p className="text-[15px] sm:text-sm text-[var(--color-muted)]">Undangan ini ditujukan kepada</p>
         <p className="mt-1 text-lg" style={{ fontFamily: "var(--font-heading)" }}>
           {content.guestName}
         </p>

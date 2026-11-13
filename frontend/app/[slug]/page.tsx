@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { getPublicInvitation } from "@/lib/api/invitations";
 import { ApiError } from "@/lib/api/client";
 import { ThemeProvider } from "@/lib/template-engine/theme-provider";
-import { RenderSection } from "@/lib/template-engine/render-section";
+import { RenderSections } from "@/lib/template-engine/render-sections";
 import { InvitationGate } from "@/components/invitation/InvitationGate";
 
 type PageProps = {
@@ -47,13 +47,10 @@ export default async function InvitationPage({ params, searchParams }: PageProps
   return (
     <ThemeProvider theme={invitation.theme}>
       <InvitationGate content={invitation.content.cover}>
-        {invitation.sections.map((section, index) => (
-          <RenderSection
-            key={`${section.type}-${index}`}
-            section={section}
-            content={invitation.content[section.type] ?? invitation.content.cover}
-          />
-        ))}
+        <RenderSections
+          sections={invitation.sections}
+          getContent={(section) => invitation.content[section.type] ?? invitation.content.cover}
+        />
       </InvitationGate>
     </ThemeProvider>
   );

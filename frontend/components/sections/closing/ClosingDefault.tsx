@@ -17,10 +17,10 @@ export function ClosingDefault({ content }: { content: ClosingContent }) {
         transition={{ duration: 0.8 }}
         className="mx-auto flex max-w-md flex-col items-center gap-3 text-center"
       >
-        <p className="text-sm text-[var(--color-muted)]">
+        <p className="text-[15px] sm:text-sm text-[var(--color-muted)]">
           Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir.
         </p>
-        <p className="mt-2 text-2xl" style={{ fontFamily: "var(--font-heading)" }}>
+        <p className="mt-2 text-[clamp(1.75rem,8vw,2.25rem)] [overflow-wrap:anywhere]" style={{ fontFamily: "var(--font-heading)" }}>
           {content.groomNickname} &amp; {content.brideNickname}
         </p>
       </motion.div>

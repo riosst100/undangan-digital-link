@@ -13,6 +13,8 @@ export const SECTION_TYPES = [
   "quote",
   "guest_greeting",
   "closing",
+  "spacer",
+  "container",
 ] as const;
 
 export type SectionType = (typeof SECTION_TYPES)[number];
@@ -28,6 +30,8 @@ export const SECTION_VARIANTS: Record<SectionType, string[]> = {
   quote: ["default"],
   guest_greeting: ["default"],
   closing: ["default"],
+  spacer: ["default"],
+  container: ["default"],
 };
 
 // Mirrors backend/config/templates.php `fonts` and `animation_presets`.

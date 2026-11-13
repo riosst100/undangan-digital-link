@@ -23,6 +23,8 @@ return [
         'quote',
         'guest_greeting',
         'closing',
+        'spacer',
+        'container',
     ],
 
     'variants' => [
@@ -36,6 +38,8 @@ return [
         'quote' => ['default'],
         'guest_greeting' => ['default'],
         'closing' => ['default'],
+        'spacer' => ['default'],
+        'container' => ['default'],
     ],
 
     // Allowlisted animation presets a theme may reference.

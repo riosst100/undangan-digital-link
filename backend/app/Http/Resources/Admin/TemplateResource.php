@@ -4,6 +4,7 @@ namespace App\Http\Resources\Admin;
 
 use App\Models\Theme;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class TemplateResource extends JsonResource
@@ -19,6 +20,9 @@ class TemplateResource extends JsonResource
             'price' => $this->price,
             'tier' => $this->tier,
             'thumbnail_url' => $this->thumbnail_url,
+            'images' => collect($this->images ?? [])
+                ->map(fn (string $path) => ['path' => $path, 'url' => Storage::disk('public')->url($path)])
+                ->values(),
             'invitations_count' => $this->whenCounted('invitations'),
             'latest_version' => $this->whenLoaded('versions', function () {
                 $latest = $this->versions->sortByDesc('version')->first();

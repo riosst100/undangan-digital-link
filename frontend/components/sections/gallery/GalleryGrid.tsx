@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { SectionHeading } from "@/components/sections/SectionHeading";
 
 export type GalleryContent = {
   items: { url?: string; caption?: string }[];
@@ -11,6 +12,7 @@ export function GalleryGrid({ content }: { content: GalleryContent }) {
 
   return (
     <section className="px-6 py-16">
+      <SectionHeading eyebrow="Our Moments" title="Galeri" />
       <div className="mx-auto grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-3">
         {content.items.map((item, index) => (
           <motion.div
@@ -23,7 +25,7 @@ export function GalleryGrid({ content }: { content: GalleryContent }) {
           >
             {item.url ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={item.url} alt={item.caption ?? ""} className="h-full w-full object-cover" />
+              <img loading="lazy" decoding="async" src={item.url} alt={item.caption ?? ""} className="h-full w-full object-cover" />
             ) : null}
           </motion.div>
         ))}

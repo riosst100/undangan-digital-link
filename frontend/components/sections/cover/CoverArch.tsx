@@ -24,7 +24,7 @@ export function CoverArch({ content }: { content: CoverContent }) {
         initial={{ opacity: 0, scale: 0.94 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.9, ease: "easeOut" }}
-        className="relative w-full max-w-[280px]"
+        className="relative w-full max-w-[min(280px,72vw)]"
       >
         <div
           className="relative aspect-[5/7] w-full text-[var(--color-secondary)]"
@@ -53,15 +53,15 @@ export function CoverArch({ content }: { content: CoverContent }) {
         className="flex flex-col items-center gap-3 text-center"
       >
         <h1
-          className="text-4xl font-medium leading-tight"
+          className="flex flex-col items-center text-[clamp(2.25rem,10vw,3rem)] font-medium leading-[1.1] [overflow-wrap:anywhere] sm:flex-row sm:flex-wrap sm:justify-center"
           style={{ fontFamily: "var(--font-heading)" }}
         >
           {content.groomNickname}
-          <span className="mx-3 text-[var(--color-primary)]">&amp;</span>
+          <span className="my-1 text-[0.7em] text-[var(--color-primary)] sm:mx-3 sm:my-0 sm:text-[1em]">&amp;</span>
           {content.brideNickname}
         </h1>
         <FloralDivider className="h-4 w-32" />
-        <p className="text-sm text-[var(--color-muted)]">{content.eventDate}</p>
+        <p className="text-[15px] sm:text-sm text-[var(--color-muted)]">{content.eventDate}</p>
       </motion.div>
     </section>
   );

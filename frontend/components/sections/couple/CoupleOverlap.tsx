@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { SectionHeading } from "@/components/sections/SectionHeading";
 import { FloralDivider } from "@/components/decor/Ornaments";
 import type { CoupleContent } from "./CoupleClassic";
 
@@ -19,7 +20,7 @@ function Portrait({
     >
       {person.photoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={person.photoUrl} alt={person.name} className="h-full w-full object-cover" />
+        <img loading="lazy" decoding="async" src={person.photoUrl} alt={person.name} className="h-full w-full object-cover" />
       ) : (
         <div
           className="flex h-full w-full items-center justify-center bg-[var(--color-secondary)] text-4xl"
@@ -35,7 +36,7 @@ function Portrait({
 function Info({ person, label }: { person: CoupleContent["bride"]; label: string }) {
   return (
     <div className="flex flex-col items-center gap-1 text-center">
-      <p className="text-[11px] uppercase tracking-[0.3em] text-[var(--color-muted)]">{label}</p>
+      <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">{label}</p>
       <h3 className="text-xl" style={{ fontFamily: "var(--font-heading)" }}>
         {person.nickname || person.name}
       </h3>
@@ -48,6 +49,7 @@ function Info({ person, label }: { person: CoupleContent["bride"]; label: string
 export function CoupleOverlap({ content }: { content: CoupleContent }) {
   return (
     <section className="px-6 py-20">
+      <SectionHeading eyebrow="Bismillah" title="Mempelai" />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}

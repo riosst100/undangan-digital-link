@@ -4,6 +4,7 @@ export type AdminTemplateSection = {
   type: SectionType;
   variant: string;
   enabled: boolean;
+  settings?: Record<string, string | number | boolean>;
 };
 
 export type AdminTemplate = {
@@ -15,6 +16,7 @@ export type AdminTemplate = {
   price: number;
   tier: "standard" | "exclusive";
   thumbnail_url: string | null;
+  images: { path: string; url: string }[];
   invitations_count: number | null;
   latest_version: {
     id: string;
@@ -48,4 +50,12 @@ export type CreateTemplateInput = {
   thumbnail_url?: string;
   sections: { type: SectionType; variant: string; enabled: boolean }[];
   theme: CreateTemplateThemeInput;
+};
+
+export type UpdateTemplateInput = {
+  name?: string;
+  description?: string | null;
+  price?: number;
+  tier?: "standard" | "exclusive";
+  is_active?: boolean;
 };

@@ -8,6 +8,8 @@ import type { SectionType } from "@/types/template";
  * it would from a real invitation.
  */
 export const DUMMY_INVITATION_CONTENT: Record<SectionType, unknown> = {
+  spacer: null,
+  container: null,
   cover: {
     brideNickname: "Sinta",
     groomNickname: "Andy",

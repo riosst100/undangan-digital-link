@@ -15,7 +15,7 @@ class Template extends Model
 
     protected $fillable = [
         'name', 'slug', 'description', 'is_active', 'created_by',
-        'price', 'tier', 'thumbnail_url',
+        'price', 'tier', 'thumbnail_url', 'images',
     ];
 
     protected function casts(): array
@@ -23,6 +23,7 @@ class Template extends Model
         return [
             'is_active' => 'boolean',
             'price' => 'integer',
+            'images' => 'array',
         ];
     }
 

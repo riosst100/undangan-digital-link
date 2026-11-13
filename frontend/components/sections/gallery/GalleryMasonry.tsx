@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { SectionHeading } from "@/components/sections/SectionHeading";
 import type { GalleryContent } from "./GalleryGrid";
 
 // Alternates tall/short aspect ratios per column position so the gallery
@@ -12,6 +13,7 @@ export function GalleryMasonry({ content }: { content: GalleryContent }) {
 
   return (
     <section className="px-6 py-16">
+      <SectionHeading eyebrow="Our Moments" title="Galeri" />
       <div className="mx-auto columns-2 gap-3 sm:columns-3 [&>*]:mb-3">
         {content.items.map((item, index) => (
           <motion.div
@@ -24,7 +26,7 @@ export function GalleryMasonry({ content }: { content: GalleryContent }) {
           >
             {item.url ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={item.url} alt={item.caption ?? ""} className="h-full w-full object-cover" />
+              <img loading="lazy" decoding="async" src={item.url} alt={item.caption ?? ""} className="h-full w-full object-cover" />
             ) : null}
           </motion.div>
         ))}

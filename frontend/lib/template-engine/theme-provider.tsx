@@ -22,7 +22,7 @@ export function ThemeProvider({ theme, children }: { theme: ThemeTokens; childre
   return (
     <div
       style={themeToCssVars(theme)}
-      className="bg-[image:var(--background-image)] bg-[var(--color-background)] bg-fixed text-[var(--color-text)]"
+      className="bg-[image:var(--background-image)] bg-[var(--color-background)] text-[var(--color-text)] [overflow-x:clip]"
     >
       {children}
     </div>

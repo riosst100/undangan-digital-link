@@ -5,6 +5,100 @@
   --font-body: var(--font-body);
 }
 
+/* Marketing/site palette (catalog, auth, admin). Invitation pages get their
+   own palette at runtime from ThemeProvider CSS variables. */
+@theme {
+  --color-cream: #fbf7f0;
+  --color-sand: #f3eee4;
+  --color-beige: #e8dcc8;
+  --color-ink: #302c27;
+  --color-ink-soft: #4a4339;
+  --color-stone: #6f665c;
+  --color-pebble: #8f877d;
+  --color-gold: #c9a86a;
+  --color-gold-deep: #8a6b3e;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   font-family: var(--font-body), Arial, Helvetica, sans-serif;
+  background-color: var(--color-cream);
+  overflow-x: clip;
 }
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-primary, var(--color-gold));
+  outline-offset: 2px;
+}
+
+/* Inputs below 16px make iOS Safari zoom on focus. */
+@media (max-width: 639px) {
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.pb-safe {
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+}
+.pt-safe {
+  padding-top: max(1.5rem, env(safe-area-inset-top));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Per-section text alignment set from the template builder (settings.align). */
+[data-text-align] * { text-align: var(--section-align) !important; }
+[data-text-align] .items-center { align-items: var(--section-items) !important; }
+[data-text-align="left"] { --section-align: left; --section-items: flex-start; }
+[data-text-align="center"] { --section-align: center; --section-items: center; }
+[data-text-align="right"] { --section-align: right; --section-items: flex-end; }
+
+/* Template builder: element-level selection. */
+.builder-canvas [data-el]:hover { outline: 1px dashed #f59e0b; outline-offset: 2px; cursor: pointer; }
+.builder-canvas [data-el][data-el-selected] { outline: 2px solid #f59e0b; outline-offset: 2px; }
+
+/* Per-column widths from the template builder; desktop only, mobile stacks. */
+@media (min-width: 640px) {
+  [data-colw] { flex: 0 1 var(--col-w) !important; min-width: 0; }
+  [data-ct-grid] { grid-template-columns: var(--ct-cols) !important; }
+}
+
+/* Free-form container block: N columns from `sm`, stacked on mobile. */
+.sec-grid { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 640px) {
+  .sec-grid { grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr)); }
+}
+
+/* Template builder device frames: viewport-height classes resolve against the
+   frame's screen, not the browser window, and the scrollbar is hidden. */
+.device-screen { --screen-h: 780px; }
+.device-screen [class*="min-h-screen"],
+.device-screen [class*="min-h-dvh"],
+.device-screen [class*="min-h-svh"] { min-height: var(--screen-h) !important; }
+.device-screen [class*="h-screen"]:not([class*="min-h-screen"]),
+.device-screen [class*="h-dvh"]:not([class*="min-h-dvh"]),
+.device-screen [class*="h-svh"]:not([class*="min-h-svh"]) { height: var(--screen-h) !important; }
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

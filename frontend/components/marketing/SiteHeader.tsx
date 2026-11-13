@@ -2,33 +2,21 @@ import Link from "next/link";
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-20 border-b border-black/5 bg-[#FBF7F0]/90 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
+    <header className="sticky top-0 z-20 border-b border-black/5 bg-cream/90 pt-[env(safe-area-inset-top)] backdrop-blur-md">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-6 sm:py-4">
         <Link
           href="/"
-          className="font-[family-name:var(--font-heading)] text-lg font-semibold tracking-tight text-[#302C27]"
+          className="min-w-0 truncate font-[family-name:var(--font-heading)] text-base font-semibold tracking-tight text-ink min-[380px]:text-lg"
         >
-          undangan-digital.link
+          undangan<span className="text-gold">-digital</span>.link
         </Link>
 
-        <nav className="flex items-center gap-2 sm:gap-3">
-          <Link
-            href="/form/undangan-tahlil"
-            className="rounded-full px-3 py-2 text-sm font-medium text-[#302C27] transition-colors hover:bg-black/5 sm:px-4"
-          >
-            Undangan Tahlil
-          </Link>
+        <nav className="flex shrink-0 items-center gap-1 sm:gap-3">
           <Link
             href="/login"
-            className="hidden rounded-full px-4 py-2 text-sm font-medium text-[#302C27] transition-colors hover:bg-black/5 sm:inline-block"
+            className="inline-flex min-h-11 items-center rounded-full px-4 text-sm font-medium text-ink transition-colors hover:bg-black/5"
           >
             Masuk
-          </Link>
-          <Link
-            href="/register"
-            className="rounded-full bg-[#302C27] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#4a4339] sm:px-5"
-          >
-            Buat Undangan
           </Link>
         </nav>
       </div>

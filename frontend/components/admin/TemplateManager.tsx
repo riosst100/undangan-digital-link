@@ -108,6 +108,18 @@ export function TemplateManager({ initialTemplates }: { initialTemplates: AdminT
                       >
                         Lihat Demo
                       </Link>
+                      <Link
+                        href={`/admin/templates/${template.id}/edit`}
+                        className="text-xs font-medium text-zinc-600 hover:text-zinc-900"
+                      >
+                        Edit
+                      </Link>
+                      <Link
+                        href={`/admin/templates/${template.id}/customize`}
+                        className="text-xs font-medium text-zinc-600 hover:text-zinc-900"
+                      >
+                        Customize
+                      </Link>
                       <button
                         type="button"
                         onClick={() => handleDelete(template)}

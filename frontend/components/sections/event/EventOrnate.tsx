@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { SectionHeading } from "@/components/sections/SectionHeading";
 import { CornerFlourish } from "@/components/decor/Ornaments";
 import type { EventContent } from "./EventCard";
 
@@ -15,6 +16,7 @@ export function EventOrnate({ content }: { content: EventContent }) {
 
   return (
     <section className="px-6 py-16">
+      <SectionHeading eyebrow="Save the Date" title="Waktu & Tempat" />
       <div className="mx-auto flex max-w-md flex-col gap-5">
         {content.events.map((event, index) => (
           <motion.div
@@ -38,20 +40,20 @@ export function EventOrnate({ content }: { content: EventContent }) {
             <h3 className="text-lg" style={{ fontFamily: "var(--font-heading)" }}>
               {event.title}
             </h3>
-            {event.date ? <p className="mt-2 text-sm text-[var(--color-muted)]">{event.date}</p> : null}
+            {event.date ? <p className="mt-2 text-[15px] sm:text-sm text-[var(--color-muted)]">{event.date}</p> : null}
             {formatTimeRange(event.startTime, event.endTime) ? (
-              <p className="text-sm text-[var(--color-muted)]">
+              <p className="text-[15px] sm:text-sm text-[var(--color-muted)]">
                 {formatTimeRange(event.startTime, event.endTime)}
               </p>
             ) : null}
-            {event.venueName ? <p className="mt-3 text-sm font-medium">{event.venueName}</p> : null}
-            {event.address ? <p className="text-sm text-[var(--color-muted)]">{event.address}</p> : null}
+            {event.venueName ? <p className="mt-3 text-[15px] sm:text-sm font-medium">{event.venueName}</p> : null}
+            {event.address ? <p className="text-[15px] sm:text-sm text-[var(--color-muted)]">{event.address}</p> : null}
             {event.mapsUrl ? (
               <a
                 href={event.mapsUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-3 inline-block rounded-[var(--radius-button)] bg-[var(--color-primary)] px-4 py-2 text-xs font-medium text-white"
+                className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--color-primary)] px-6 text-[15px] sm:text-sm font-medium text-white shadow-sm transition-transform active:scale-95"
               >
                 Lihat Lokasi
               </a>

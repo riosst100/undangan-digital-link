@@ -20,7 +20,7 @@ export default async function Home() {
   const hasCatalog = catalog !== null && (catalog.all.length > 0 || catalog.exclusive.length > 0);
 
   return (
-    <div className="flex min-h-dvh flex-col bg-[#FBF7F0] text-[#302C27]">
+    <div className="flex min-h-dvh flex-col bg-cream text-ink">
       <SiteHeader />
 
       <main className="flex-1">

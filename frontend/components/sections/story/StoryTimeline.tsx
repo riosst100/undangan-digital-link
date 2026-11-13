@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { SectionHeading } from "@/components/sections/SectionHeading";
 
 export type StoryContent = {
   title?: string;
@@ -13,11 +14,7 @@ export function StoryTimeline({ content }: { content: StoryContent }) {
   return (
     <section className="px-6 py-16">
       <div className="mx-auto max-w-md">
-        {content.title ? (
-          <h2 className="mb-8 text-center text-xl" style={{ fontFamily: "var(--font-heading)" }}>
-            {content.title}
-          </h2>
-        ) : null}
+        {content.title ? <SectionHeading eyebrow="Love Story" title={content.title} /> : null}
 
         <div className="relative flex flex-col gap-8 border-l border-[var(--color-secondary)] pl-6">
           {content.items.map((item, index) => (
@@ -37,7 +34,7 @@ export function StoryTimeline({ content }: { content: StoryContent }) {
               ) : null}
               <h3 className="mt-1 text-base font-medium">{item.title}</h3>
               {item.description ? (
-                <p className="mt-1 text-sm text-[var(--color-muted)]">{item.description}</p>
+                <p className="mt-1 text-[15px] sm:text-sm text-[var(--color-muted)]">{item.description}</p>
               ) : null}
             </motion.div>
           ))}

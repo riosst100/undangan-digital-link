@@ -12,7 +12,7 @@ export type CoverContent = {
 
 export function CoverFullscreen({ content }: { content: CoverContent }) {
   return (
-    <section className="relative flex h-dvh w-full flex-col items-center justify-center overflow-hidden">
+    <section className="relative flex min-h-svh w-full flex-col items-center justify-center overflow-hidden">
       {content.coverPhotoUrl ? (
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -30,15 +30,15 @@ export function CoverFullscreen({ content }: { content: CoverContent }) {
         className="relative z-10 flex flex-col items-center gap-4 px-6 text-center text-white"
       >
         {content.guestName ? (
-          <p className="text-sm tracking-wide">Kepada Yth. {content.guestName}</p>
+          <p className="text-[15px] sm:text-sm tracking-wide">Kepada Yth. {content.guestName}</p>
         ) : null}
         <h1
-          className="text-4xl font-medium tracking-wide"
+          className="text-[clamp(2.25rem,10vw,3.25rem)] font-medium leading-tight tracking-wide [overflow-wrap:anywhere] [text-wrap:balance]"
           style={{ fontFamily: "var(--font-heading)" }}
         >
           {content.groomNickname} &amp; {content.brideNickname}
         </h1>
-        <p className="text-sm">{content.eventDate}</p>
+        <p className="text-[15px] sm:text-sm">{content.eventDate}</p>
       </motion.div>
     </section>
   );
