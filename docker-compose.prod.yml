@@ -1,5 +1,7 @@
 # Production: https://catalog.undangan-digital.link (Caddy on the host -> frontend 127.0.0.1:3070, API 127.0.0.1:8070).
-#   ./deploy.sh         pull master, rebuild, restart
+#   ./deploy.sh         pull master + the images CI built (ghcr.io), restart; run by hand it builds here instead
+# Images are built by GitHub Actions (.github/workflows/deploy.yml) so the 4GB server never runs a build.
+# mem_limit caps each container so one runaway process can't OOM the other stacks on this server.
 # Secrets come from .env next to this file (see .env.prod.example). docker-compose.yml is the dev stack.
 name: undangan
 
@@ -12,6 +14,7 @@ services:
     image: postgres:16-alpine
     container_name: undangan-db
     restart: unless-stopped
+    mem_limit: 512m
     environment:
       POSTGRES_DB: undangan_digital
       POSTGRES_USER: undangan_app
@@ -29,9 +32,11 @@ services:
     build:
       context: ./docker/backend
       dockerfile: Dockerfile.prod
-    image: undangan-backend:prod
+    image: ghcr.io/riosst100/undangan-backend:latest
     container_name: undangan-backend
     restart: unless-stopped
+    # Headroom for composer install + migrations at startup and PHP-FPM workers (8 x 256M max).
+    mem_limit: 768m
     user: "1000:1000"
     volumes:
       - ./backend:/app
@@ -64,6 +69,7 @@ services:
     image: nginx:1.27-alpine
     container_name: undangan-nginx
     restart: unless-stopped
+    mem_limit: 128m
     volumes:
       - ./backend/public:/app/public:ro
       # public/storage is a symlink to /app/storage/app/public: uploads must exist at that path here too.
@@ -81,9 +87,10 @@ services:
       args:
         NEXT_PUBLIC_APP_URL: https://catalog.undangan-digital.link
         NEXT_PUBLIC_API_URL: https://catalog.undangan-digital.link
-    image: undangan-frontend:prod
+    image: ghcr.io/riosst100/undangan-frontend:latest
     container_name: undangan-frontend
     restart: unless-stopped
+    mem_limit: 512m
     environment:
       NODE_ENV: production
       # Server-side fetches go straight to the API container instead of out through Cloudflare.
